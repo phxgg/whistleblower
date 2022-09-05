@@ -1,6 +1,6 @@
 {
   "token": "",
-  "application_id": ""
+  "application_id": "",
 
   "logging_channel_ids": {
     "message_deleted": "",
