@@ -14,10 +14,10 @@ const client = new Client({
   partials: ['MESSAGE', 'CHANNEL', 'REACTION', 'USER'],
 });
 
-const { token, logging_channels_ids } = require('../config.json');
+const { token, logging_channel_ids } = require('../config.json');
 const Paginator = require('./paginator.js');
 
-if (!logging_channels_ids.message_deleted || !logging_channels_ids.message_edited) {
+if (!logging_channel_ids.message_deleted || !logging_channel_ids.message_edited) {
   console.error('[whistleblower] ERROR: All logging channel IDs need to be provided.');
   process.exit(1);
 }
@@ -62,7 +62,7 @@ client.on('messageDelete', async (message) => {
       embed.setColor('#ff4040')
     }
 
-    await client.channels.fetch(logging_channels_ids.message_deleted).then((channel) => {
+    await client.channels.fetch(logging_channel_ids.message_deleted).then((channel) => {
       channel.send({ embeds: [embed] });
     });
   }
@@ -87,7 +87,7 @@ client.on('messageUpdate', async (oldMessage, newMessage) => {
       })
       .setTimestamp(newMessage.createdAt);
 
-    await client.channels.fetch(logging_channels_ids.message_edited).then((channel) => {
+    await client.channels.fetch(logging_channel_ids.message_edited).then((channel) => {
       channel.send({ embeds: [embed] });
     });
   }
