@@ -1,0 +1,9 @@
+{
+  "token": "",
+  "application_id": ""
+
+  "logging_channel_ids": {
+    "message_deleted": "",
+    "message_edited": ""
+  }
+}

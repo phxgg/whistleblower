@@ -2,10 +2,17 @@
   "name": "whistleblower",
   "version": "1.0.0",
   "description": "Discord bot that keeps track of everything happening on your server.",
-  "main": "app.js",
+  "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "register": "node scripts/register.js",
+    "bot": "node src/index.js",
+    "dev": "nodemon src/index.js"
   },
   "author": "phxgg",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "discord-api-types": "^0.37.5",
+    "discord.js": "^14.3.0",
+    "nodemon": "^2.0.19"
+  }
 }
