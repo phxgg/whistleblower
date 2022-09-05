@@ -5,12 +5,12 @@ const path = require('node:path');
 
 const { token, application_id } = require('../config.json');
 
-const guild_id = process.argv[2];
+// const guild_id = process.argv[2];
 
-if (!guild_id) {
-  console.error('[whistleblower] ERROR: No guild ID provided');
-  process.exit(1);
-}
+// if (!guild_id) {
+//   console.error('[whistleblower] ERROR: No guild ID provided');
+//   process.exit(1);
+// }
 
 const fs = require('node:fs');
 
@@ -31,7 +31,8 @@ const rest = new REST({ version: '10' }).setToken(token);
     console.log(`[whistleblower] Started refreshing ${commands.length} application (/) commands.`)
 
     const data = await rest.put(
-      Routes.applicationGuildCommands(application_id, guild_id),
+      // Routes.applicationGuildCommands(application_id, guild_id),
+      Routes.applicationCommands(application_id),
       { body: commands },
     );
 
