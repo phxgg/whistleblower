@@ -2,6 +2,7 @@ const {
   Client,
   GatewayIntentBits,
   EmbedBuilder,
+  ChannelType,
 } = require('discord.js');
 
 const client = new Client({
@@ -14,7 +15,12 @@ const client = new Client({
   partials: ['MESSAGE', 'CHANNEL', 'REACTION', 'USER'],
 });
 
-const { token, logging_channel_ids } = require('../config.json');
+const {
+  token,
+  logging_channel_ids,
+  exclude_channel_ids,
+  track_all_channels_by_default
+} = require('../config.json');
 const Paginator = require('./paginator.js');
 
 if (!logging_channel_ids.message_deleted || !logging_channel_ids.message_edited) {
@@ -22,7 +28,8 @@ if (!logging_channel_ids.message_deleted || !logging_channel_ids.message_edited)
   process.exit(1);
 }
 
-const trackChannels = [];
+// const trackChannels = [];
+const trackChannels = {};
 
 const formatEmoji = (emoji) => {
   return !emoji.id || emoji.available
@@ -36,6 +43,27 @@ process.on('uncaughtException', console.error);
 
 client.on('ready', () => {
   console.log(`[whistleblower] Logged in as ${client.user.tag}`);
+
+  // push all text channels into trackChannels
+  if (track_all_channels_by_default) {
+    const guilds = client.guilds.cache.map(async guild => {
+      trackChannels[guild.id] = [];
+      console.log(`[whistleblower] Joined guild ${guild.name}`)
+
+      const channels = await guild.channels.fetch();
+
+      channels.map(channel => {
+        if ((channel.type === ChannelType.GuildText
+          || channel.type === ChannelType.GuildVoice)
+          && !exclude_channel_ids.includes(channel.id)) {
+          // trackChannels.push(channel.id);
+          trackChannels[guild.id].push(channel.id);
+
+          console.log(`[whistleblower] Tracking channel ${channel.name} (${channel.id})`);
+        }
+      });
+    });
+  }
 });
 
 /**
@@ -45,7 +73,7 @@ client.on('ready', () => {
 client.on('messageDelete', async (message) => {
   if (message.partial) return; // content is null or deleted embed
 
-  if (trackChannels.includes(message.channel.id)) {
+  if (trackChannels[message.guild.id].includes(message.channel.id)) {
 
     const embed = new EmbedBuilder()
       .setAuthor({ name: message.author.tag, iconURL: message.author.displayAvatarURL() })
@@ -71,7 +99,7 @@ client.on('messageDelete', async (message) => {
 client.on('messageUpdate', async (oldMessage, newMessage) => {
   if (oldMessage.partial) return; // content is null
 
-  if (trackChannels.includes(newMessage.channel.id)) {
+  if (trackChannels[message.guild.id].includes(newMessage.channel.id)) {
 
     const embed = new EmbedBuilder()
       .setColor(0x7289DA)
@@ -111,18 +139,31 @@ client.on('interactionCreate', async (interaction) => {
   const channel = interaction.options.getChannel('channel') || interaction.channel;
 
   if (interaction.commandName === 'track') {
-
-    if (trackChannels.indexOf(channel.id) !== -1) {
+    if (trackChannels[interaction.guild.id].indexOf(channel.id) !== -1) {
       return interaction.reply({
         content: `:x: Already tracking ${channel.name}`,
         ephemeral: true
       });
     }
     
-    trackChannels.push(channel.id);
+    trackChannels[interaction.guild.id].push(channel.id);
 
     await interaction.reply({
       content: `:white_check_mark: Tracking ${channel.name}`,
+      ephemeral: true
+    });
+  } else if (interaction.commandName === 'untrack') {
+    if (trackChannels[interaction.guild.id].indexOf(channel.id) === -1) {
+      return interaction.reply({
+        content: `:x: Not tracking ${channel.name}`,
+        ephemeral: true
+      });
+    }
+
+    trackChannels[interaction.guild.id].splice(trackChannels[interaction.guild.id].indexOf(channel.id), 1);
+
+    await interaction.reply({
+      content: `:white_check_mark: No longer tracking ${channel.name}`,
       ephemeral: true
     });
   }

@@ -5,5 +5,11 @@
   "logging_channel_ids": {
     "message_deleted": "",
     "message_edited": ""
-  }
+  },
+
+  "track_all_channels_by_default": true,
+
+  "exclude_channel_ids": [
+    ""
+  ]
 }
