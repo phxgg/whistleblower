@@ -99,7 +99,7 @@ client.on('messageDelete', async (message) => {
 client.on('messageUpdate', async (oldMessage, newMessage) => {
   if (oldMessage.partial) return; // content is null
 
-  if (trackChannels[message.guild.id].includes(newMessage.channel.id)) {
+  if (trackChannels[newMessage.guild.id].includes(newMessage.channel.id)) {
 
     const embed = new EmbedBuilder()
       .setColor(0x7289DA)
