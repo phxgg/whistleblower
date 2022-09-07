@@ -8,9 +8,9 @@ module.exports = {
   once: false,
   async execute(message) {
     if (message.partial) return; // content is null or deleted embed
+    if (message.author.bot) return // ignore bots
 
     if (trackChannels[message.guild.id].includes(message.channel.id)) {
-
       const embed = new EmbedBuilder()
         .setAuthor({ name: message.author.tag, iconURL: message.author.displayAvatarURL() })
         .setTitle('Message Deleted')
@@ -21,12 +21,9 @@ module.exports = {
         .setTimestamp(message.createdAt);
 
       if (message.attachments.size > 0) {
-        const attachmentFields = [];
         for (const attachment of message.attachments.values()) {
-          attachmentFields.push({ name: attachment.name, value: attachment.url, inline: true });
+          embed.addFields({ name: attachment.name, value: attachment.url, inline: true });
         }
-
-        embed.addFields(attachmentFields);
       }
 
       if (message.author.bot) {
