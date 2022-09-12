@@ -1,5 +1,6 @@
 const { EmbedBuilder, Message } = require('discord.js');
-const { trackChannels } = require('../shared.js');
+// const { trackChannels } = require('../shared.js');
+const { getTrackChannels } = require('../shared.js');
 
 const { logging_channel_ids } = require('../../config.json');
 
@@ -20,7 +21,9 @@ module.exports = {
       // })
       ) return;
 
-    if (trackChannels[newMessage.guild.id].includes(newMessage.channel.id)) {
+    const trackChannels = await getTrackChannels(oldMessage.guild.id);
+
+    if (trackChannels.includes(newMessage.channel.id)) {
 
       const embed = new EmbedBuilder()
         .setColor(0x7289DA)

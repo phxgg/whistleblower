@@ -1,3 +1,7 @@
+/**
+ * This script will register all global commands for the bot.
+ */
+
 const { REST } = require('@discordjs/rest');
 // const { Routes } = require('discord-api-types/v9');
 const { Routes } = require('discord.js')

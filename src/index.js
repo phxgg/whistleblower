@@ -11,6 +11,7 @@ const {
   logging_channel_ids
 } = require('../config.json');
 const Paginator = require('./paginator.js');
+const db = require('./db');
 
 const client = new Client({
   intents: [
@@ -30,6 +31,10 @@ if (!logging_channel_ids.message_deleted || !logging_channel_ids.message_edited)
 // prevent exit on error
 process.on('unhandledRejection', console.error);
 process.on('uncaughtException', console.error);
+process.on('beforeExit', (code) => {
+  console.log('closing db connection');
+  db.close();
+});
 
 // capture errors
 client.on('error', (e) => console.error(e));

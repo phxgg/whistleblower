@@ -1,5 +1,6 @@
 const { EmbedBuilder } = require('discord.js');
-const { trackChannels } = require('../shared.js');
+// const { trackChannels } = require('../shared.js');
+const { getTrackChannels } = require('../shared.js');
 
 const { logging_channel_ids } = require('../../config.json');
 
@@ -10,7 +11,9 @@ module.exports = {
     if (message.partial) return; // content is null or deleted embed
     if (message.author.bot) return // ignore bots
 
-    if (trackChannels[message.guild.id].includes(message.channel.id)) {
+    const trackChannels = await getTrackChannels(message.guild.id);
+
+    if (trackChannels.includes(message.channel.id)) {
       const embed = new EmbedBuilder()
         .setAuthor({ name: message.author.tag, iconURL: message.author.displayAvatarURL() })
         .setTitle('Message Deleted')
