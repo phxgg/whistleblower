@@ -6,10 +6,7 @@ const {
   GatewayIntentBits,
 } = require('discord.js');
 
-const {
-  token,
-  logging_channel_ids
-} = require('../config.json');
+const { token } = require('../config.json');
 const Paginator = require('./paginator.js');
 const db = require('./db');
 
@@ -22,11 +19,6 @@ const client = new Client({
   ],
   partials: ['MESSAGE', 'CHANNEL', 'REACTION', 'USER'],
 });
-
-if (!logging_channel_ids.message_deleted || !logging_channel_ids.message_edited) {
-  console.error('[whistleblower] ERROR: All logging channel IDs need to be provided.');
-  process.exit(1);
-}
 
 // prevent exit on error
 process.on('unhandledRejection', console.error);

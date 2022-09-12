@@ -1,6 +1,7 @@
 const {
   getTrackChannels,
   addToTrackChannels,
+  addToLoggingChannels,
   removeFromTrackChannels
 } = require('../shared.js');
 
@@ -23,8 +24,13 @@ module.exports = {
     const channel = interaction.options.getChannel('channel') || interaction.channel;
 
     const trackChannels = await getTrackChannels(interaction.guild.id);
+    
+    if (interaction.commandName === 'log') { // log
+      const event = interaction.options.getSubcommand();
+      await addToLoggingChannels(event, interaction.guild.id, channel.id);
 
-    if (interaction.commandName === 'track') {
+      interaction.editReply(`:white_check_mark: Logging event ${event} in ${channel}`);
+    } else if (interaction.commandName === 'track') { // track
       if (trackChannels.indexOf(channel.id) !== -1) {
         return interaction.editReply({
           content: `:x: Already tracking ${channel.name}`,
@@ -33,14 +39,13 @@ module.exports = {
       }
       
       // add channel to guild's track_channels array
-      // trackChannels[interaction.guild.id].push(channel.id);
       await addToTrackChannels(interaction.guild.id, channel.id);
   
       await interaction.editReply({
         content: `:white_check_mark: Tracking ${channel.name}`,
         ephemeral: true
       });
-    } else if (interaction.commandName === 'untrack') {
+    } else if (interaction.commandName === 'untrack') { // untrack
       if (trackChannels.indexOf(channel.id) === -1) {
         return interaction.editReply({
           content: `:x: Not tracking ${channel.name}`,
@@ -49,7 +54,6 @@ module.exports = {
       }
   
       // remove channel from guild's track_channels array
-      // trackChannels[interaction.guild.id].splice(trackChannels[interaction.guild.id].indexOf(channel.id), 1);
       await removeFromTrackChannels(interaction.guild.id, channel.id);
   
       await interaction.editReply({

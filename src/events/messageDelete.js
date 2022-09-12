@@ -1,8 +1,5 @@
 const { EmbedBuilder } = require('discord.js');
-// const { trackChannels } = require('../shared.js');
-const { getTrackChannels } = require('../shared.js');
-
-const { logging_channel_ids } = require('../../config.json');
+const { getTrackChannels, getLoggingChannels } = require('../shared.js');
 
 module.exports = {
   name: 'messageDelete',
@@ -11,13 +8,16 @@ module.exports = {
     if (message.partial) return; // content is null or deleted embed
     if (message.author.bot) return // ignore bots
 
+    const loggingChannels = await getLoggingChannels(message.guild.id);
+    if (!loggingChannels.message_delete) return;
+
     const trackChannels = await getTrackChannels(message.guild.id);
 
     if (trackChannels.includes(message.channel.id)) {
       const embed = new EmbedBuilder()
         .setAuthor({ name: message.author.tag, iconURL: message.author.displayAvatarURL() })
         .setTitle('Message Deleted')
-        .setDescription((message.content) ? message.content : '`empty`')
+        .setDescription((message.content) ? message.content : 'None')
         .setFooter({
           text: `#${message.channel.name}`
         })
@@ -35,7 +35,7 @@ module.exports = {
         embed.setColor('#ff4040')
       }
 
-      await message.client.channels.fetch(logging_channel_ids.message_deleted).then((channel) => {
+      await message.client.channels.fetch(loggingChannels.message_delete).then((channel) => {
         channel.send({ embeds: [embed] });
       });
     }

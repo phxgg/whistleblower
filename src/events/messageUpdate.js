@@ -1,8 +1,5 @@
-const { EmbedBuilder, Message } = require('discord.js');
-// const { trackChannels } = require('../shared.js');
-const { getTrackChannels } = require('../shared.js');
-
-const { logging_channel_ids } = require('../../config.json');
+const { EmbedBuilder } = require('discord.js');
+const { getTrackChannels, getLoggingChannels } = require('../shared.js');
 
 module.exports = {
   name: 'messageUpdate',
@@ -19,25 +16,27 @@ module.exports = {
       //   // return attachment.url === newMessage.attachments[index].url;
       //   return newMessage.attachments.has(attachment.id);
       // })
-      ) return;
+    ) return;
+
+    const loggingChannels = await getLoggingChannels(oldMessage.guild.id);
+    if (!loggingChannels.message_update) return;
 
     const trackChannels = await getTrackChannels(oldMessage.guild.id);
 
     if (trackChannels.includes(newMessage.channel.id)) {
-
       const embed = new EmbedBuilder()
         .setColor(0x7289DA)
         .setAuthor({ name: newMessage.author.tag, iconURL: newMessage.author.displayAvatarURL() })
         .setTitle('Message Edited')
         .setDescription(`[see message](${newMessage.url})`)
-        .addFields({ name: 'Original', value: (oldMessage.content) ? oldMessage.content : '`empty`' })
+        .addFields({ name: 'Original', value: (oldMessage.content) ? oldMessage.content : 'None' })
         .setFooter({
           text: `#${newMessage.channel.name}`
         })
         .setTimestamp(newMessage.createdAt);
 
       if (oldMessage.content !== newMessage.content) {
-        embed.addFields({ name: 'Edited', value: (newMessage.content) ? newMessage.content : '`empty`' });
+        embed.addFields({ name: 'Edited', value: (newMessage.content) ? newMessage.content : 'None' });
       }
 
       if (oldMessage.attachments.size > 0 && newMessage.attachments.size !== oldMessage.attachments.size) {
@@ -48,7 +47,7 @@ module.exports = {
         }
       }
 
-      await newMessage.client.channels.fetch(logging_channel_ids.message_edited).then((channel) => {
+      await newMessage.client.channels.fetch(loggingChannels.message_update).then((channel) => {
         channel.send({ embeds: [embed] });
       });
     }

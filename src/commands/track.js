@@ -5,6 +5,7 @@ const { SlashCommandBuilder } = require('discord.js');
 const data = new SlashCommandBuilder()
   .setName('track')
   .setDescription('Track a channel')
+  .setDMPermission(false)
   .addChannelOption((option) =>
     option
       .setName('channel')

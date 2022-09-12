@@ -5,18 +5,19 @@ const {
   track_all_channels_by_default,
   exclude_channel_ids
 } = require('../config.json');
+const { ChannelType } = require('discord.js');
 
 const insertNewGuild = async (guild) => {
   try {
     const guildsCollection = database.collection('guilds');
 
-    const guildObject = await guildsCollection.insertOne({
+    const guildObject = {
       guild_id: guild.id,
       guild_owner_id: guild.ownerId,
       guild_name: guild.name,
       logging_channels: {},
       track_channels: []
-    });
+    };
 
     if (track_all_channels_by_default) {
       const channels = await guild.channels.fetch();
@@ -32,7 +33,7 @@ const insertNewGuild = async (guild) => {
 
     const options = { ordered: true };
     const result = await guildsCollection.insertOne(guildObject, options);
-    console.log(`[whistleblower] Inserted guild ${result.insertedId} into the collection`);
+    // console.log(`[whistleblower] Inserted guild ${result.insertedId} into the collection`);
   } catch (err) {
     console.error(err);
   }
@@ -50,8 +51,32 @@ const getLoggingChannels = async (guildId) => {
     );
 
     if (!findGuild) return {};
-
+    
     return findGuild.logging_channels;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const addToLoggingChannels = async (event, guildId, channelId) => {
+  try {
+    const guildsCollection = database.collection('guilds');
+
+    const findGuild = await guildsCollection.findOne(
+      { guild_id: guildId },
+      {
+        projection: { _id: 0, guild_id: 1, logging_channels: 1 }
+      }
+    );
+
+    if (!findGuild) return;
+
+    const updateGuild = await guildsCollection.updateOne(
+      { guild_id: guildId },
+      { $set: { [`logging_channels.${event}`]: channelId } }
+    );
+
+    // console.log(`[whistleblower] Updated guild ${updateGuild.matchedCount} in the collection`);
   } catch (err) {
     console.error(err);
   }
@@ -136,6 +161,8 @@ const formatEmoji = (emoji) => {
 
 module.exports = {
   insertNewGuild,
+  getLoggingChannels,
+  addToLoggingChannels,
   getTrackChannels,
   addToTrackChannels,
   removeFromTrackChannels,

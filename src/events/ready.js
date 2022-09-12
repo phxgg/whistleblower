@@ -1,6 +1,3 @@
-const { ChannelType } = require('discord.js');
-
-// const { trackChannels } = require('../shared.js');
 const { insertNewGuild } = require('../shared.js');
 const db = require('../db.js');
 
@@ -31,8 +28,6 @@ module.exports = {
       });
     } catch (err) {
       console.error(err);
-    } finally {
-      await db.close();
     }
   }
 };
