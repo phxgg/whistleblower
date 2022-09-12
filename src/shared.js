@@ -1,8 +1,64 @@
 const db = require('./db.js');
+const database = db.db('whistleblower');
+
+const {
+  track_all_channels_by_default,
+  exclude_channel_ids
+} = require('../config.json');
+
+const insertNewGuild = async (guild) => {
+  try {
+    const guildsCollection = database.collection('guilds');
+
+    const guildObject = await guildsCollection.insertOne({
+      guild_id: guild.id,
+      guild_owner_id: guild.ownerId,
+      guild_name: guild.name,
+      logging_channels: {},
+      track_channels: []
+    });
+
+    if (track_all_channels_by_default) {
+      const channels = await guild.channels.fetch();
+
+      await channels.map(channel => {
+        if ((channel.type === ChannelType.GuildText
+          || channel.type === ChannelType.GuildVoice)
+          && !exclude_channel_ids.includes(channel.id)) {
+          guildObject.track_channels.push(channel.id);
+        }
+      });
+    }
+
+    const options = { ordered: true };
+    const result = await guildsCollection.insertOne(guildObject, options);
+    console.log(`[whistleblower] Inserted guild ${result.insertedId} into the collection`);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const getLoggingChannels = async (guildId) => {
+  try {
+    const guildsCollection = database.collection('guilds');
+
+    const findGuild = await guildsCollection.findOne(
+      { guild_id: guildId },
+      {
+        projection: { _id: 0, guild_id: 1, logging_channels: 1 }
+      }
+    );
+
+    if (!findGuild) return {};
+
+    return findGuild.logging_channels;
+  } catch (err) {
+    console.error(err);
+  }
+};
 
 const getTrackChannels = async (guildId) => {
   try {
-    const database = db.db('whistleblower');
     const guildsCollection = database.collection('guilds');
 
     const findGuild = await guildsCollection.findOne(
@@ -22,7 +78,6 @@ const getTrackChannels = async (guildId) => {
 
 const addToTrackChannels = async (guildId, channelId) => {
   try {
-    const database = db.db('whistleblower');
     const guildsCollection = database.collection('guilds');
 
     const findGuild = await guildsCollection.findOne(
@@ -49,7 +104,6 @@ const addToTrackChannels = async (guildId, channelId) => {
 
 const removeFromTrackChannels = async (guildId, channelId) => {
   try {
-    const database = db.db('whistleblower');
     const guildsCollection = database.collection('guilds');
 
     const findGuild = await guildsCollection.findOne(
@@ -81,6 +135,7 @@ const formatEmoji = (emoji) => {
 };
 
 module.exports = {
+  insertNewGuild,
   getTrackChannels,
   addToTrackChannels,
   removeFromTrackChannels,
