@@ -22,8 +22,9 @@ module.exports = {
           }
         );
 
+        // if guild was not found, insert it
         if (!findGuild) {
-          await insertNewGuild(guild);
+          await insertGuild(guild);
         }
       });
     } catch (err) {

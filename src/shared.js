@@ -7,7 +7,7 @@ const {
 } = require('../config.json');
 const { ChannelType } = require('discord.js');
 
-const insertNewGuild = async (guild) => {
+const insertGuild = async (guild) => {
   try {
     const guildsCollection = database.collection('guilds');
 
@@ -33,7 +33,18 @@ const insertNewGuild = async (guild) => {
 
     const options = { ordered: true };
     const result = await guildsCollection.insertOne(guildObject, options);
-    // console.log(`[whistleblower] Inserted guild ${result.insertedId} into the collection`);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const deleteGuild = async (guildId) => {
+  try {
+    const guildsCollection = database.collection('guilds');
+
+    const deleteGuild = await guildsCollection.deleteOne(
+      { guild_id: guildId }
+    );
   } catch (err) {
     console.error(err);
   }
@@ -146,8 +157,6 @@ const removeFromTrackChannels = async (guildId, channelId) => {
       { guild_id: guildId },
       { $pull: { track_channels: channelId } }
     );
-
-    console.log(`[whistleblower] Updated guild ${updateGuild.matchedCount} in the collection`);
   } catch (err) {
     console.error(err);
   }
@@ -160,7 +169,8 @@ const formatEmoji = (emoji) => {
 };
 
 module.exports = {
-  insertNewGuild,
+  insertGuild,
+  deleteGuild,
   getLoggingChannels,
   addToLoggingChannels,
   getTrackChannels,

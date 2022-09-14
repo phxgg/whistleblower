@@ -1,9 +1,9 @@
-const { insertNewGuild } = require('../shared.js');
+const { insertGuild } = require('../shared.js');
 
 module.exports = {
   name: 'guildCreate',
   once: false,
   async execute(guild) {
-    await insertNewGuild(guild);
+    await insertGuild(guild);
   }
 };
