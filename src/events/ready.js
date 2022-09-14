@@ -1,4 +1,4 @@
-const { insertNewGuild } = require('../shared.js');
+const { insertGuild } = require('../shared.js');
 const db = require('../db.js');
 
 module.exports = {
