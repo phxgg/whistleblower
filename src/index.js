@@ -1,14 +1,15 @@
 const path = require('node:path');
 const fs = require('node:fs');
+const logger = require('./services/logger.service')(module);
+const mongoose = require('mongoose');
 
 const {
   Client,
   GatewayIntentBits,
 } = require('discord.js');
 
-const { token } = require('../config.json');
+const { token, mongodb_uri } = require('../config.json');
 const Paginator = require('./paginator.js');
-const db = require('./db');
 
 const client = new Client({
   intents: [
@@ -20,17 +21,28 @@ const client = new Client({
   partials: ['MESSAGE', 'CHANNEL', 'REACTION', 'USER'],
 });
 
+// MongoDB Database Connection
+mongoose.connect(mongodb_uri, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+}).then(() => {
+  logger.info('Successfully connected to db.');
+}).catch(err => {
+  logger.error(`Could not connect to db: ${err}`);
+  process.exit();
+});
+
 // prevent exit on error
 process.on('unhandledRejection', console.error);
 process.on('uncaughtException', console.error);
 process.on('beforeExit', (code) => {
-  console.log('closing db connection');
-  db.close();
+  logger.info('Closing db connection.');
+  mongoose.connection.close();
 });
 
 // capture errors
-client.on('error', (e) => console.error(e));
-client.on('warn', (e) => console.warn(e));
+client.on('error', (e) => logger.error(e));
+client.on('warn', (e) => logger.warn(e));
 // client.on('debug', (e) => console.info(e));
 
 // load all event files

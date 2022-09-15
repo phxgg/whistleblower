@@ -3,7 +3,7 @@ const {
   addToTrackChannels,
   addToLoggingChannels,
   removeFromTrackChannels
-} = require('../shared.js');
+} = require('../services/guild.service');
 
 module.exports = {
   name: 'interactionCreate',

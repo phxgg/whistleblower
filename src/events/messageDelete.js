@@ -1,5 +1,5 @@
 const { EmbedBuilder } = require('discord.js');
-const { getTrackChannels, getLoggingChannels } = require('../shared.js');
+const { getTrackChannels, getLoggingChannels } = require('../services/guild.service');
 
 module.exports = {
   name: 'messageDelete',

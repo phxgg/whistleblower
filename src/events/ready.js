@@ -1,5 +1,7 @@
-const { insertGuild } = require('../shared.js');
-const db = require('../db.js');
+const { insertGuild } = require('../services/guild.service');
+const { handleError } = require('../shared');
+
+const Guild = require('../models/guild.model');
 
 module.exports = {
   name: 'ready',
@@ -9,26 +11,11 @@ module.exports = {
 
     client.user.setActivity('you', { type: 'WATCHING' });
 
-    const database = db.db('whistleblower');
-
-    try {
-      const guildsCollection = database.collection('guilds');
-
-      const guilds = client.guilds.cache.map(async guild => {
-        const findGuild = await guildsCollection.findOne(
-          { guild_id: guild.id },
-          {
-            projection: { _id: 0, guild_id: 1 }
-          }
-        );
-
-        // if guild was not found, insert it
-        if (!findGuild) {
-          await insertGuild(guild);
-        }
+    const guilds = client.guilds.cache.map(async guild =>  {
+      Guild.findOne({ guild_id: guild.id }, '_id guild_id', (err, g) => {
+        if (err) return handleError(err);
+        if (!g) insertGuild(guild);
       });
-    } catch (err) {
-      console.error(err);
-    }
+    });
   }
 };
