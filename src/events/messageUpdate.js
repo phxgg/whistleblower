@@ -1,5 +1,6 @@
 const { EmbedBuilder } = require('discord.js');
 const { getGuild } = require('../services/guild.service');
+const { uploadAttachment } = require('../services/attachments.service');
 
 module.exports = {
   name: 'messageUpdate',
