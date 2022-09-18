@@ -46,7 +46,9 @@ module.exports = {
         // embed.addFields({ name: 'Previous attachments', value: '.' });
 
         for (const attachment of oldMessage.attachments.values()) {
-          embed.addFields({ name: attachment.name, value: attachment.url, inline: true });
+          const upload = await uploadAttachment(attachment);
+          const attachmentLink = (upload?.link) ? upload.link : 'None';
+          embed.addFields({ name: attachment.name, value: attachmentLink, inline: true });
         }
       }
 

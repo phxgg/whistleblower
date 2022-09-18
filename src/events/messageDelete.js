@@ -30,7 +30,8 @@ module.exports = {
       if (message.attachments.size > 0) {
         for (const attachment of message.attachments.values()) {
           const upload = await uploadAttachment(attachment);
-          embed.addFields({ name: attachment.name, value: (upload?.link) ? upload.link : 'None', inline: true });
+          const attachmentLink = (upload?.link) ? upload.link : 'None';
+          embed.addFields({ name: attachment.name, value: attachmentLink, inline: true });
         }
       }
 
