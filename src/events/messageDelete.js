@@ -1,5 +1,5 @@
 const { EmbedBuilder } = require('discord.js');
-const { getTrackChannels, getLoggingChannels } = require('../services/guild.service');
+const { getGuild } = require('../services/guild.service');
 
 module.exports = {
   name: 'messageDelete',
@@ -8,10 +8,13 @@ module.exports = {
     if (message.partial) return; // content is null or deleted embed
     if (message.author.bot) return // ignore bots
 
-    const loggingChannels = await getLoggingChannels(message.guild.id);
-    if (!loggingChannels.message_delete) return;
+    const guild = await getGuild(message.guild.id, 'logging_channels track_channels');
+    if (!guild) return;
 
-    const trackChannels = await getTrackChannels(message.guild.id);
+    const loggingChannels = guild?.logging_channels;
+    const trackChannels = guild?.track_channels;
+
+    if (!loggingChannels?.message_delete || !trackChannels) return;
 
     if (trackChannels.includes(message.channel.id)) {
       const embed = new EmbedBuilder()

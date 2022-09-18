@@ -1,5 +1,5 @@
 const { EmbedBuilder } = require('discord.js');
-const { getTrackChannels, getLoggingChannels } = require('../services/guild.service');
+const { getGuild } = require('../services/guild.service');
 
 module.exports = {
   name: 'messageUpdate',
@@ -18,10 +18,13 @@ module.exports = {
       // })
     ) return;
 
-    const loggingChannels = await getLoggingChannels(oldMessage.guild.id);
-    if (!loggingChannels.message_update) return;
+    const guild = await getGuild(oldMessage.guild.id, 'logging_channels track_channels');
+    if (!guild) return;
 
-    const trackChannels = await getTrackChannels(oldMessage.guild.id);
+    const loggingChannels = guild?.logging_channels;
+    const trackChannels = guild?.track_channels;
+
+    if (!loggingChannels?.message_update || !trackChannels) return;
 
     if (trackChannels.includes(newMessage.channel.id)) {
       const embed = new EmbedBuilder()

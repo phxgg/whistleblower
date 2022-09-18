@@ -7,6 +7,16 @@ const {
 } = require('../../config.json');
 const { ChannelType } = require('discord.js');
 
+const getGuild = async (guildId, projection) => {
+  var g;
+  if (projection)
+    g = await Guild.findOne({ guild_id: guildId }, projection).exec().catch(err => handleError(err));
+  else
+    g = await Guild.findOne({ guild_id: guildId }).exec().catch(err => handleError(err));
+  if (!g) return {};
+  return g;
+};
+
 const insertGuild = async (guild) => {
   const guildObject = {
     guild_id: guild.id,
@@ -83,6 +93,7 @@ const removeFromTrackChannels = async (guildId, channelId) => {
 };
 
 module.exports = {
+  getGuild,
   insertGuild,
   deleteGuild,
   getLoggingChannels,
