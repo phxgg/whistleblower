@@ -24,7 +24,9 @@ const uploadAttachment = async (attachment) => {
     method: 'POST',
     url: 'https://safenote.co/api/file',
     responseType: 'json',
-    data: formData
+    data: formData,
+    maxContentLength: Infinity,
+    maxBodyLength: Infinity
   });
 
   if (!upload.data?.success)
