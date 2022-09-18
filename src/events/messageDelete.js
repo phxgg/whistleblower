@@ -1,5 +1,6 @@
 const { EmbedBuilder } = require('discord.js');
 const { getGuild } = require('../services/guild.service');
+const { uploadAttachment } = require('../services/attachments.service');
 
 module.exports = {
   name: 'messageDelete',
@@ -28,7 +29,8 @@ module.exports = {
 
       if (message.attachments.size > 0) {
         for (const attachment of message.attachments.values()) {
-          embed.addFields({ name: attachment.name, value: attachment.url, inline: true });
+          const upload = await uploadAttachment(attachment);
+          embed.addFields({ name: attachment.name, value: (upload?.link) ? upload.link : 'None', inline: true });
         }
       }
 
