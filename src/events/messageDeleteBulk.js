@@ -2,10 +2,14 @@ const { EmbedBuilder } = require('discord.js');
 const { getGuild } = require('../services/guild.service');
 const { uploadAttachment } = require('../services/attachments.service');
 
+/**
+ * TODO
+ */
+
 module.exports = {
-  name: 'messageDelete',
+  name: 'messageDeleteBulk',
   once: false,
-  async execute(message) {
+  async execute(messages) {
     if (message.partial) return; // content is null or deleted embed
     if (message.author.bot) return // ignore bots
 
@@ -18,7 +22,8 @@ module.exports = {
     if (!loggingChannels?.message_delete
       || !trackChannels
       || !trackChannels.includes(message.channel.id)) return;
-
+    
+    // for (var i = 0; i < )
     const embed = new EmbedBuilder()
       .setAuthor({ name: message.author.tag, iconURL: message.author.displayAvatarURL() })
       .setTitle('Message Deleted')

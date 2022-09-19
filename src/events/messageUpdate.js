@@ -25,37 +25,37 @@ module.exports = {
     const loggingChannels = guild?.logging_channels;
     const trackChannels = guild?.track_channels;
 
-    if (!loggingChannels?.message_update || !trackChannels) return;
+    if (!loggingChannels?.message_update
+      || !trackChannels
+      || !trackChannels.includes(newMessage.channel.id)) return;
+    
+    const embed = new EmbedBuilder()
+      .setColor(0x7289DA)
+      .setAuthor({ name: newMessage.author.tag, iconURL: newMessage.author.displayAvatarURL() })
+      .setTitle('Message Edited')
+      .setDescription(`[see message](${newMessage.url})`)
+      .addFields({ name: 'Original', value: (oldMessage.content) ? oldMessage.content : 'None' })
+      .setFooter({
+        text: `#${newMessage.channel.name}`
+      })
+      .setTimestamp(newMessage.createdAt);
 
-    if (trackChannels.includes(newMessage.channel.id)) {
-      const embed = new EmbedBuilder()
-        .setColor(0x7289DA)
-        .setAuthor({ name: newMessage.author.tag, iconURL: newMessage.author.displayAvatarURL() })
-        .setTitle('Message Edited')
-        .setDescription(`[see message](${newMessage.url})`)
-        .addFields({ name: 'Original', value: (oldMessage.content) ? oldMessage.content : 'None' })
-        .setFooter({
-          text: `#${newMessage.channel.name}`
-        })
-        .setTimestamp(newMessage.createdAt);
-
-      if (oldMessage.content !== newMessage.content) {
-        embed.addFields({ name: 'Edited', value: (newMessage.content) ? newMessage.content : 'None' });
-      }
-
-      if (oldMessage.attachments.size > 0 && newMessage.attachments.size !== oldMessage.attachments.size) {
-        // embed.addFields({ name: 'Previous attachments', value: '.' });
-
-        for (const attachment of oldMessage.attachments.values()) {
-          const upload = await uploadAttachment(attachment);
-          const attachmentLink = (upload?.link) ? upload.link : 'None';
-          embed.addFields({ name: attachment.name, value: attachmentLink, inline: true });
-        }
-      }
-
-      await newMessage.client.channels.fetch(loggingChannels.message_update).then((channel) => {
-        channel.send({ embeds: [embed] });
-      });
+    if (oldMessage.content !== newMessage.content) {
+      embed.addFields({ name: 'Edited', value: (newMessage.content) ? newMessage.content : 'None' });
     }
+
+    if (oldMessage.attachments.size > 0 && newMessage.attachments.size !== oldMessage.attachments.size) {
+      // embed.addFields({ name: 'Previous attachments', value: '.' });
+
+      for (const attachment of oldMessage.attachments.values()) {
+        const upload = await uploadAttachment(attachment);
+        const attachmentLink = (upload?.link) ? upload.link : 'None';
+        embed.addFields({ name: attachment.name, value: attachmentLink, inline: true });
+      }
+    }
+
+    await newMessage.client.channels.fetch(loggingChannels.message_update).then((channel) => {
+      channel.send({ embeds: [embed] });
+    });
   }
 };
