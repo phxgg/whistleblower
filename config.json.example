@@ -4,6 +4,7 @@
   "application_id": "",
   
   "track_all_channels_by_default": true,
+  "upload_attachments": false,
 
   "exclude_channel_ids": [
     ""

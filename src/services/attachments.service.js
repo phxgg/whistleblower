@@ -1,8 +1,20 @@
-const { handleError } = require('../shared');
+const { handleError, BytesToMB } = require('../shared');
 const axios = require('axios');
 const FormData = require('form-data');
 
+const { upload_attachments } = require('../../config.json');
+
+const noUpload = (msg) => {
+  return { link: msg };
+};
+
 const uploadAttachment = async (attachment) => {
+  // Only enable if upload_attachments is true
+  if (!upload_attachments) return noUpload(attachment.url); // return attachment url
+
+  // Check attachment size
+  if (BytesToMB(attachment.size) > 20) return noUpload('Attachment size too big'); // max file size 20MB
+
   const fileName = attachment.url.substring(attachment.url.lastIndexOf('/') + 1);
 
   const res = await axios({
@@ -30,7 +42,7 @@ const uploadAttachment = async (attachment) => {
   });
 
   if (!upload.data?.success)
-    return { link: 'error' };
+    return noUpload('Error uploading attachment');
 
   return upload.data;
 };

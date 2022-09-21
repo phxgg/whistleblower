@@ -17,8 +17,13 @@ const formatEmoji = (emoji) => {
     : `[:${emoji.name}:](${emoji.url})`; // bot cannot use the emoji
 };
 
+const BytesToMB = (bytes) => {
+  return bytes / 1024 / 1024;
+};
+
 module.exports = {
   handleError,
   generateRandomString,
-  formatEmoji
+  formatEmoji,
+  BytesToMB
 };
