@@ -17,6 +17,8 @@ var schema = mongoose.Schema({
     type: Object
   },
   track_channels: [String]
+}, {
+  timestamps: true
 });
 
 schema.method('toJSON', function () {
