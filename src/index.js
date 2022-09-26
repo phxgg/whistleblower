@@ -2,14 +2,21 @@ const path = require('node:path');
 const fs = require('node:fs');
 const logger = require('./services/logger.service')(module);
 const mongoose = require('mongoose');
+const redisService = require('./services/redis.service'); // define a variable so code gets executed once
 
 const {
   Client,
   GatewayIntentBits,
 } = require('discord.js');
 
-const { token, mongodb_uri } = require('../config.json');
+const {
+  token,
+  mongodb_uri
+ } = require('../config.json');
+
 const Paginator = require('./paginator.js');
+
+redisService.setup();
 
 const client = new Client({
   intents: [
@@ -37,6 +44,7 @@ process.on('unhandledRejection', console.error);
 process.on('uncaughtException', console.error);
 process.on('beforeExit', (code) => {
   logger.info('Closing db connection.');
+  redisService.disconnect();
   mongoose.connection.close();
 });
 

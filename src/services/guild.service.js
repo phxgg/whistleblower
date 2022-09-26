@@ -1,14 +1,15 @@
+const { ChannelType } = require('discord.js');
 const { handleError } = require('../shared');
+const redisService = require('../services/redis.service');
 const Guild = require('../models/guild.model.js');
 
 const {
   track_all_channels_by_default,
   exclude_channel_ids
 } = require('../../config.json');
-const { ChannelType } = require('discord.js');
 
 const getGuild = async (guildId, projection) => {
-  let g = await Guild.findOne({ guild_id: guildId }, projection).exec().catch(err => handleError(err));
+  let g = await Guild.findOne({ guild_id: guildId }, projection).cache();
   if (!g) return {};
   return g;
 };
@@ -44,6 +45,8 @@ const deleteGuild = async (guildId) => {
   Guild.deleteOne({ guild_id: guildId }, (err) => {
     if (err) return handleError(err);
   });
+
+  redisService.clearKey(Guild.collection.collectionName);
 };
 
 const getLoggingChannels = async (guildId) => {
@@ -64,6 +67,8 @@ const addToLoggingChannels = async (event, guildId, channelId) => {
   Guild.updateOne({ guild_id: guildId }, update, (err, guild) => {
     if (err) return handleError(err);
   });
+
+  redisService.clearKey(Guild.collection.collectionName);
 };
 
 const getTrackChannels = async (guildId) => {
@@ -77,7 +82,9 @@ const addToTrackChannels = async (guildId, channelId) => {
 
   Guild.updateOne({ guild_id: guildId }, update, (err, guild) => {
     if (err) return handleError(err);
-  })
+  });
+
+  redisService.clearKey(Guild.collection.collectionName);
 };
 
 const removeFromTrackChannels = async (guildId, channelId) => {
@@ -85,7 +92,9 @@ const removeFromTrackChannels = async (guildId, channelId) => {
 
   Guild.updateOne({ guild_id: guildId }, update, (err, guild) => {
     if (err) return handleError(err);
-  })
+  });
+
+  redisService.clearKey(Guild.collection.collectionName);
 };
 
 module.exports = {
