@@ -15,13 +15,15 @@ const redisClient = redis.createClient({
   retry_strategy: () => 1000
 });
 
-// Call this only once
+/**
+ * Call this function only once in the application
+ * Setups the redis cache for mongoose
+ */
 const setup = () => {
   if (!redis_enable) {
     mongoose.Query.prototype.cache = function() {
       return this;
     };
-
     return;
   }
 
@@ -39,7 +41,6 @@ const setup = () => {
     this.useCache = true;
     this.time = options.time;
     this.hashKey = JSON.stringify(options.key || this.mongooseCollection.name);
-
     return this;
   };
 
@@ -72,15 +73,23 @@ const setup = () => {
   };
 };
 
+/**
+ * Clears the cache for the given hashKey
+ * @param {string} hashKey
+ */
 const clearKey = (hashKey) => {
   if (!redis_enable) return;
   redisClient.del(JSON.stringify(hashKey));
 };
 
+/**
+ * Disconnect from redis
+ */
 const disconnect = () => {
   if (!redis_enable) return;
+  logger.info('Closing redis connection');
   redisClient.disconnect();
-}
+};
 
 module.exports = {
   setup,

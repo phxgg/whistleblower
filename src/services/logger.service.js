@@ -3,11 +3,19 @@ const path = require('node:path');
 
 // Logger Service
 
+/**
+ * @param {NodeModule} callingModule
+ * @returns {string} label for the logger
+ */
 const getLabel = (callingModule) => {
   const parts = callingModule.filename.split(path.sep);
   return path.join(parts[parts.length - 2], parts.pop());
 };
 
+/**
+ * @param {NodeModule} callingModule
+ * @returns {winston.Logger}
+ */
 module.exports = (callingModule) => {
   return new winston.createLogger({
     format: winston.format.combine(

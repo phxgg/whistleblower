@@ -5,9 +5,12 @@ const { uploadAttachment } = require('../services/attachments.service');
 module.exports = {
   name: 'messageDelete',
   once: false,
+  /**
+   * @param {import('discord.js').Message} message
+   */
   async execute(message) {
     if (message.partial) return; // content is null or deleted embed
-    if (message.author.bot) return // ignore bots
+    if (message.author.bot) return; // ignore bots
 
     const guild = await getGuild(message.guild.id, 'logging_channels track_channels');
     if (!guild) return;

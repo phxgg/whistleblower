@@ -8,6 +8,9 @@ const {
 module.exports = {
   name: 'interactionCreate',
   once: false,
+  /**
+   * @param {import('discord.js').Interaction} interaction
+   */
   async execute(interaction) {
     if (!interaction.isCommand()) return;
 
@@ -29,7 +32,7 @@ module.exports = {
       const event = interaction.options.getSubcommand();
       await addToLoggingChannels(event, interaction.guild.id, channel.id);
 
-      interaction.editReply(`:white_check_mark: Logging event ${event} in ${channel}`);
+      interaction.editReply(`:white_check_mark: Logging event \`${event}\` in ${channel}`);
     } else if (interaction.commandName === 'track') { // track
       if (trackChannels.indexOf(channel.id) !== -1) {
         return interaction.editReply({

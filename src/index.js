@@ -14,7 +14,7 @@ const {
   mongodb_uri
  } = require('../config.json');
 
-const Paginator = require('./paginator.js');
+// const Paginator = require('./paginator.js');
 
 redisService.setup();
 
@@ -61,10 +61,12 @@ for (const file of eventFiles) {
   const filePath = path.join(eventsPath, file);
   const event = require(filePath);
 
-  if (event.once)
+  if (event.once) {
     client.once(event.name, (...args) => event.execute(...args));
-  else
+  }
+  else {
     client.on(event.name, (...args) => event.execute(...args));
+  }
 }
 
 // start

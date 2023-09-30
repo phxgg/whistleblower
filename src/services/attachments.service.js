@@ -1,19 +1,35 @@
 const { handleError, BytesToMB } = require('../shared');
 const axios = require('axios');
 const FormData = require('form-data');
+const logger = require('./logger.service')(module);
 
 const { upload_attachments } = require('../../config.json');
 
+/**
+ * @param {string} msg
+ * @returns {Object} { link: '...' }
+ */
 const noUpload = (msg) => {
   return { link: msg };
 };
 
+/**
+ * @param {import('discord.js').Attachment} attachment
+ * @returns {Object}
+ */
 const uploadAttachment = async (attachment) => {
   // Only enable if upload_attachments is true
-  if (!upload_attachments) return noUpload(attachment.url); // return attachment url
+  if (!upload_attachments) {
+    return noUpload(attachment.url); // return attachment url
+  }
 
   // Check attachment size
-  if (BytesToMB(attachment.size) > 20) return noUpload('Attachment size too big'); // max file size 20MB
+  // if attachment size too big, return attachment url
+  // max file size 20MB
+  if (BytesToMB(attachment.size) > 20) {
+    logger.warn(`Attachment size too big: ${attachment.size}`);
+    return noUpload(attachment.url);
+  }
 
   const fileName = attachment.url.substring(attachment.url.lastIndexOf('/') + 1);
 
@@ -41,8 +57,11 @@ const uploadAttachment = async (attachment) => {
     maxBodyLength: Infinity
   });
 
-  if (!upload.data?.success)
-    return noUpload('Error uploading attachment');
+  if (!upload.data?.success) {
+    logger.warn(`Error uploading attachment.`);
+    // error uploading attachment
+    return noUpload(attachment.url);
+  }
 
   return upload.data;
 };

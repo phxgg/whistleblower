@@ -5,6 +5,10 @@ const { uploadAttachment } = require('../services/attachments.service');
 module.exports = {
   name: 'messageUpdate',
   once: false,
+  /**
+   * @param {import('discord.js').Message} oldMessage
+   * @param {import('discord.js').Message} newMessage
+   */
   async execute(oldMessage, newMessage) {
     if (oldMessage.partial || newMessage.partial) return; // content is null
     if (oldMessage.author.bot) return; // ignore bots
