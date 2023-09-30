@@ -12,7 +12,7 @@ const {
 const {
   token,
   mongodb_uri
- } = require('../config.json');
+} = require('../config.json');
 
 // const Paginator = require('./paginator.js');
 
