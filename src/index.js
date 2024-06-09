@@ -29,10 +29,7 @@ const client = new Client({
 });
 
 // MongoDB Database Connection
-mongoose.connect(mongodb_uri, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-}).then(() => {
+mongoose.connect(mongodb_uri).then(() => {
   logger.info('Successfully connected to db.');
 }).catch(err => {
   logger.error(`Could not connect to db: ${err}`);
