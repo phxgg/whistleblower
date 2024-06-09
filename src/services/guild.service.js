@@ -35,7 +35,7 @@ const insertGuild = async (guild) => {
   if (track_all_channels_by_default) {
     const channels = await guild.channels.fetch();
 
-    await channels.map(channel => {
+    channels.map(channel => {
       if ((channel.type === ChannelType.GuildText
         || channel.type === ChannelType.GuildVoice)
         && !exclude_channel_ids.includes(channel.id)) {
