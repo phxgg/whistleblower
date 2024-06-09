@@ -14,8 +14,11 @@ const noUpload = (msg) => {
 };
 
 /**
+ * Upload attachment to file sharing api.
+ * Sometimes, the attachment is instantly deleted from the discord cdn,
+ * before we can even download it. In that case, the file is not uploaded.
  * @param {import('discord.js').Attachment} attachment
- * @returns {Object}
+ * @returns {{ success: boolean, key: string, link: string }}
  */
 const uploadAttachment = async (attachment) => {
   // Only enable if upload_attachments is true
@@ -33,6 +36,7 @@ const uploadAttachment = async (attachment) => {
 
   const fileName = attachment.url.substring(attachment.url.lastIndexOf('/') + 1);
 
+  // Get the attachment data
   const res = await axios({
     method: 'GET',
     url: attachment.url,
