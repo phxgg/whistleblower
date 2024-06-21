@@ -7,7 +7,9 @@
     "register": "node scripts/register.js",
     "delete": "node scripts/delete.js",
     "bot": "node src/index.js",
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon src/index.js",
+    "ncu:check": "npx npm-check-updates -x eslint",
+    "ncu:update": "npx npm-check-updates -u -x eslint"
   },
   "author": "phxgg",
   "license": "ISC",
