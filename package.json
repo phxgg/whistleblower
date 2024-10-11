@@ -17,7 +17,7 @@
     "axios": "^1.7.7",
     "discord-api-types": "^0.37.101",
     "discord.js": "^14.16.3",
-    "form-data": "^4.0.0",
+    "form-data": "^4.0.1",
     "mongodb": "^6.9.0",
     "mongoose": "^8.7.1",
     "nodemon": "^3.1.7",
