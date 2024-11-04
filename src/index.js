@@ -7,6 +7,7 @@ const redisService = require('./services/redis.service'); // define a variable s
 const {
   Client,
   GatewayIntentBits,
+  Partials,
 } = require('discord.js');
 
 const {
@@ -25,7 +26,12 @@ const client = new Client({
     GatewayIntentBits.MessageContent,
     GatewayIntentBits.GuildMessageReactions,
   ],
-  partials: ['MESSAGE', 'CHANNEL', 'REACTION', 'USER'],
+  partials: [
+    Partials.Message,
+    Partials.Channel,
+    Partials.Reaction,
+    Partials.User,
+  ]
 });
 
 // MongoDB Database Connection
