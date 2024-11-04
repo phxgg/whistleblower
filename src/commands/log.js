@@ -1,9 +1,9 @@
-const { SlashCommandBuilder, ChannelType } = require('discord.js');
+const { SlashCommandBuilder, ChannelType, InteractionContextType } = require('discord.js');
 
 const data = new SlashCommandBuilder()
   .setName('log')
   .setDescription('Setup a logging channel for a specific event')
-  .setDMPermission(false)
+  .setContexts([InteractionContextType.Guild])
   .addSubcommand(subcommand =>
     subcommand
       .setName('message_delete')
