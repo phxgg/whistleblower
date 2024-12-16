@@ -8,8 +8,8 @@
     "delete": "node scripts/delete.js",
     "bot": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "ncu:check": "npx npm-check-updates -x eslint",
-    "ncu:update": "npx npm-check-updates -u -x eslint"
+    "ncu:check": "npx npm-check-updates",
+    "ncu:update": "npx npm-check-updates -u"
   },
   "author": "phxgg",
   "license": "ISC",
