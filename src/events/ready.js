@@ -2,9 +2,10 @@ const { insertGuild } = require('../services/guild.service');
 const { handleError } = require('../shared');
 
 const Guild = require('../models/guild.model');
+const { Events } = require('discord.js');
 
 module.exports = {
-  name: 'ready',
+  name: Events.ClientReady,
   once: true,
   /**
    * @param {import('discord.js').Client} client

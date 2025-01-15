@@ -1,9 +1,10 @@
 const { EmbedBuilder } = require('discord.js');
 const { getGuild } = require('../services/guild.service');
 const { uploadAttachment } = require('../services/attachments.service');
+const { Events } = require('discord.js');
 
 module.exports = {
-  name: 'messageUpdate',
+  name: Events.MessageUpdate,
   once: false,
   /**
    * @param {import('discord.js').Message} oldMessage
