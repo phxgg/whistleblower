@@ -1,3 +1,4 @@
+const { Events } = require('discord.js');
 const {
   getTrackChannels,
   addToTrackChannels,
@@ -6,7 +7,7 @@ const {
 } = require('../services/guild.service');
 
 module.exports = {
-  name: 'interactionCreate',
+  name: Events.InteractionCreate,
   once: false,
   /**
    * @param {import('discord.js').Interaction} interaction

@@ -36,38 +36,43 @@ const uploadAttachment = async (attachment) => {
 
   const fileName = attachment.url.substring(attachment.url.lastIndexOf('/') + 1);
 
-  // Get the attachment data
-  const res = await axios({
-    method: 'GET',
-    url: attachment.url,
-    responseType: 'stream'
-  });
+  try {
+    // Get the attachment data
+    const res = await axios({
+      method: 'GET',
+      url: attachment.url,
+      responseType: 'stream'
+    });
 
-  const stream = res.data;
+    const stream = res.data;
 
-  // docs: https://safenote.co/file-sharing-api
-  const formData = new FormData();
-  formData.append('file', stream, fileName);
-  formData.append('lifetime', 72); // 72 hours = 3 days
-  formData.append('read_count', 1000000);
+    // docs: https://safenote.co/file-sharing-api
+    const formData = new FormData();
+    formData.append('file', stream, fileName);
+    formData.append('lifetime', 72); // 72 hours = 3 days
+    formData.append('read_count', 1000000);
 
-  // axios post to upload file to api
-  const upload = await axios({
-    method: 'POST',
-    url: 'https://safenote.co/api/file',
-    responseType: 'json',
-    data: formData,
-    maxContentLength: Infinity,
-    maxBodyLength: Infinity
-  });
+    // axios post to upload file to api
+    const upload = await axios({
+      method: 'POST',
+      url: 'https://safenote.co/api/file',
+      responseType: 'json',
+      data: formData,
+      maxContentLength: Infinity,
+      maxBodyLength: Infinity
+    });
 
-  if (!upload.data?.success) {
-    logger.warn(`Error uploading attachment.`);
-    // error uploading attachment
+    if (!upload.data?.success) {
+      logger.warn(`Attachment upload was not successful.`);
+      // error uploading attachment
+      return noUpload(attachment.url);
+    }
+
+    return upload.data;
+  } catch (err) {
+    logger.error(`Error uploading attachment`, err);
     return noUpload(attachment.url);
   }
-
-  return upload.data;
 };
 
 module.exports = {
