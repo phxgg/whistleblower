@@ -14,7 +14,7 @@
   "author": "phxgg",
   "license": "ISC",
   "dependencies": {
-    "axios": "^1.8.1",
+    "axios": "^1.8.2",
     "discord-api-types": "^0.37.119",
     "discord.js": "^14.18.0",
     "form-data": "^4.0.2",
