@@ -19,7 +19,7 @@
     "discord.js": "^14.18.0",
     "form-data": "^4.0.2",
     "mongodb": "^6.15.0",
-    "mongoose": "^8.13.0",
+    "mongoose": "^8.13.2",
     "nodemon": "^3.1.9",
     "redis": "^4.7.0",
     "winston": "^3.17.0"
