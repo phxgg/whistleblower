@@ -12,5 +12,7 @@
 
   "exclude_channel_ids": [
     ""
-  ]
+  ],
+
+  "banned_user_ids": []
 }
