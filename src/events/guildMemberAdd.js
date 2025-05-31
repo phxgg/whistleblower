@@ -1,5 +1,3 @@
-// 889686709846032414
-
 const { Events } = require("discord.js");
 
 const {

@@ -14,5 +14,7 @@
     ""
   ],
 
-  "banned_user_ids": []
+  "banned_user_ids": [
+    ""
+  ]
 }
