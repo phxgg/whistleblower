@@ -15,11 +15,11 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^1.11.0",
-    "discord-api-types": "^0.38.20",
-    "discord.js": "^14.21.0",
+    "discord-api-types": "^0.38.21",
+    "discord.js": "^14.22.1",
     "form-data": "^4.0.4",
     "mongodb": "^6.18.0",
-    "mongoose": "^8.17.2",
+    "mongoose": "^8.18.0",
     "nodemon": "^3.1.10",
     "redis": "^5.8.2",
     "winston": "^3.17.0"
