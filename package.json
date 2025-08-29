@@ -15,7 +15,7 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^1.11.0",
-    "discord-api-types": "^0.38.21",
+    "discord-api-types": "^0.38.22",
     "discord.js": "^14.22.1",
     "form-data": "^4.0.4",
     "mongodb": "^6.19.0",
