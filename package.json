@@ -9,19 +9,20 @@
     "bot": "node src/index.js",
     "dev": "nodemon src/index.js",
     "ncu:check": "npx npm-check-updates",
-    "ncu:update": "npx npm-check-updates -u"
+    "ncu:update": "npx npm-check-updates -u",
+    "bump-deps": "npm run ncu:update && npm install && git add . && git commit -m \"chore: bump deps\""
   },
   "author": "phxgg",
   "license": "ISC",
   "dependencies": {
-    "axios": "^1.12.1",
-    "discord-api-types": "^0.38.24",
-    "discord.js": "^14.22.1",
+    "axios": "^1.13.0",
+    "discord-api-types": "^0.38.31",
+    "discord.js": "^14.24.0",
     "form-data": "^4.0.4",
-    "mongodb": "^6.19.0",
-    "mongoose": "^8.18.1",
+    "mongodb": "^6.20.0",
+    "mongoose": "^8.19.2",
     "nodemon": "^3.1.10",
-    "redis": "^5.8.2",
-    "winston": "^3.17.0"
+    "redis": "^5.9.0",
+    "winston": "^3.18.3"
   }
 }
