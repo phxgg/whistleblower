@@ -13,7 +13,7 @@
     "bump-deps": "npm run ncu:update && npm install && git add . && git commit -m \"chore: bump deps\""
   },
   "author": "phxgg",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "axios": "^1.13.0",
     "discord-api-types": "^0.38.31",
