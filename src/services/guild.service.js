@@ -1,8 +1,9 @@
 import { ChannelType } from 'discord.js';
-import { handleError } from '../shared.js';
-import redisService from '../services/redis.service.js';
-import Guild from '../models/guild.model.js';
+
 import config from '../../config.json' with { type: 'json' };
+import Guild from '../models/guild.model.js';
+import redisService from '../services/redis.service.js';
+import { handleError } from '../shared.js';
 
 /**
  * @param {string} guildId
@@ -25,16 +26,18 @@ const insertGuild = async (guild) => {
     guild_owner_id: guild.ownerId,
     guild_name: guild.name,
     logging_channels: {},
-    track_channels: []
+    track_channels: [],
   };
 
   if (config.track_all_channels_by_default) {
     const channels = await guild.channels.fetch();
 
-    channels.map(channel => {
-      if ((channel.type === ChannelType.GuildText
-        || channel.type === ChannelType.GuildVoice)
-        && !config.exclude_channel_ids.includes(channel.id)) {
+    channels.map((channel) => {
+      if (
+        (channel.type === ChannelType.GuildText ||
+          channel.type === ChannelType.GuildVoice) &&
+        !config.exclude_channel_ids.includes(channel.id)
+      ) {
         guildObject.track_channels.push(channel.id);
       }
     });
@@ -66,7 +69,9 @@ const deleteGuild = async (guildId) => {
  * @returns {Object} logging channels object
  */
 const getLoggingChannels = async (guildId) => {
-  let g = await Guild.findOne({ guild_id: guildId }, 'logging_channels').exec().catch(err => handleError(err));
+  let g = await Guild.findOne({ guild_id: guildId }, 'logging_channels')
+    .exec()
+    .catch((err) => handleError(err));
   if (!g) return {};
   return g.logging_channels;
 };
@@ -93,7 +98,9 @@ const addToLoggingChannels = async (event, guildId, channelId) => {
  * @returns {Array<string>}
  */
 const getTrackChannels = async (guildId) => {
-  let g = await Guild.findOne({ guild_id: guildId }, 'track_channels').exec().catch(err => handleError(err));
+  let g = await Guild.findOne({ guild_id: guildId }, 'track_channels')
+    .exec()
+    .catch((err) => handleError(err));
   if (!g) return [];
   return g.track_channels;
 };
@@ -137,4 +144,4 @@ export {
   getTrackChannels,
   addToTrackChannels,
   removeFromTrackChannels,
-}
+};

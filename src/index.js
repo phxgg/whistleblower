@@ -1,11 +1,13 @@
-import path from 'node:path';
 import fs from 'node:fs';
+import path from 'node:path';
+import { pathToFileURL } from 'node:url';
+
 import { Client, GatewayIntentBits, Partials } from 'discord.js';
 import mongoose from 'mongoose';
-import redisService from './services/redis.service.js';
-import { pathToFileURL } from 'node:url';
-import { createLogger } from './services/logger.service.js';
+
 import config from '../config.json' with { type: 'json' };
+import { createLogger } from './services/logger.service.js';
+import redisService from './services/redis.service.js';
 
 const logger = createLogger(import.meta);
 
@@ -27,16 +29,19 @@ const client = new Client({
     Partials.Reaction,
     Partials.User,
     Partials.GuildMember,
-  ]
+  ],
 });
 
 // MongoDB Database Connection
-mongoose.connect(config.mongodb_uri).then(() => {
-  logger.info('Successfully connected to db.');
-}).catch(err => {
-  logger.error(`Could not connect to db: ${err}`);
-  process.exit();
-});
+mongoose
+  .connect(config.mongodb_uri)
+  .then(() => {
+    logger.info('Successfully connected to db.');
+  })
+  .catch((err) => {
+    logger.error(`Could not connect to db: ${err}`);
+    process.exit();
+  });
 
 // prevent exit on error
 process.on('unhandledRejection', console.error);
@@ -54,7 +59,9 @@ client.on('warn', (e) => logger.warn(e));
 
 // load all event files
 const eventsPath = path.join(import.meta.dirname, 'events');
-const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+const eventFiles = fs
+  .readdirSync(eventsPath)
+  .filter((file) => file.endsWith('.js'));
 
 for (const file of eventFiles) {
   const filePath = path.join(eventsPath, file);
@@ -64,8 +71,7 @@ for (const file of eventFiles) {
 
   if (event.once) {
     client.once(event.name, (...args) => event.execute(...args));
-  }
-  else {
+  } else {
     client.on(event.name, (...args) => event.execute(...args));
   }
 }

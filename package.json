@@ -9,6 +9,9 @@
     "delete": "node scripts/delete.mjs",
     "bot": "node src/index.js",
     "dev": "nodemon src/index.js",
+    "lint:check": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
     "ncu:check": "npx npm-check-updates",
     "ncu:update": "npx npm-check-updates -u",
     "bump-deps": "npm run ncu:update && npm install && git add . && git commit -m \"chore: bump deps\""
@@ -25,5 +28,14 @@
     "nodemon": "^3.1.11",
     "redis": "^5.10.0",
     "winston": "^3.18.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "globals": "^16.5.0",
+    "prettier": "3.6.2"
   }
 }

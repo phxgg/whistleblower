@@ -1,4 +1,5 @@
 import { Events } from 'discord.js';
+
 import { insertGuild } from '../services/guild.service.js';
 
 export default {
@@ -9,5 +10,5 @@ export default {
    */
   async execute(guild) {
     await insertGuild(guild);
-  }
+  },
 };

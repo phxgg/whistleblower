@@ -4,6 +4,7 @@
 
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord.js';
+
 import config from '../config.json' with { type: 'json' };
 
 const rest = new REST({ version: '10' }).setToken(config.token);
@@ -12,10 +13,12 @@ const rest = new REST({ version: '10' }).setToken(config.token);
   try {
     const data = await rest.put(
       Routes.applicationCommands(config.application_id),
-      { body: [] },
+      { body: [] }
     );
 
-    console.log(`[whistleblower] Successfully deleted all application (/) commands.`);
+    console.log(
+      `[whistleblower] Successfully deleted all application (/) commands.`
+    );
   } catch (err) {
     console.error(err);
   }

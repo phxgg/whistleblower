@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, InteractionContextType } from 'discord.js';
+import { InteractionContextType, SlashCommandBuilder } from 'discord.js';
 
 // TODO: option to track all channels in a guild
 
@@ -7,7 +7,5 @@ export const data = new SlashCommandBuilder()
   .setDescription('Track a channel')
   .setContexts([InteractionContextType.Guild])
   .addChannelOption((option) =>
-    option
-      .setName('channel')
-      .setDescription('Channel to keep track of')
+    option.setName('channel').setDescription('Channel to keep track of')
   );

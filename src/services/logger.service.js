@@ -1,6 +1,7 @@
-import winston from 'winston';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import winston from 'winston';
 
 // Logger Service
 
@@ -23,21 +24,25 @@ export const createLogger = (importMeta) => {
     format: winston.format.combine(
       winston.format.label({ label: getLabel(importMeta) }),
       winston.format.timestamp({
-        format: "YYYY/MM/DD hh:mm:ss"
+        format: 'YYYY/MM/DD hh:mm:ss',
       }),
       winston.format.printf(
-        info => `[${info.timestamp}] - "${info.label}" => [${info.level}]: "${info.message}"${info.stack ? '\n' + info.stack : ''}`
-      ),
+        (info) =>
+          `[${info.timestamp}] - "${info.label}" => [${info.level}]: "${info.message}"${info.stack ? '\n' + info.stack : ''}`
+      )
       //winston.format.json(),
     ),
     transports: [
       new winston.transports.Console({
         format: winston.format.colorize({ all: true }),
       }),
-      new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
+      new winston.transports.File({
+        filename: 'logs/error.log',
+        level: 'error',
+      }),
       new winston.transports.File({ filename: 'logs/combined.log' }),
-    ]
+    ],
   });
-}
+};
 
 export default createLogger;

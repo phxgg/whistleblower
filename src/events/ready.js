@@ -1,6 +1,7 @@
 import { Events } from 'discord.js';
-import { insertGuild } from '../services/guild.service.js';
+
 import Guild from '../models/guild.model.js';
+import { insertGuild } from '../services/guild.service.js';
 import { handleError } from '../shared.js';
 
 export default {
@@ -14,7 +15,7 @@ export default {
 
     client.user.setActivity('you', { type: 'WATCHING' });
 
-    client.guilds.cache.map(async guild =>  {
+    client.guilds.cache.map(async (guild) => {
       try {
         const g = await Guild.findOne({ guild_id: guild.id }, '_id guild_id');
         if (!g) insertGuild(guild);
@@ -22,5 +23,5 @@ export default {
         handleError(err);
       }
     });
-  }
+  },
 };

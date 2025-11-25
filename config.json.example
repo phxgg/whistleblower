@@ -2,21 +2,18 @@
   "mongodb_uri": "",
   "token": "",
   "application_id": "",
-  
+
   "redis": {
     "enable": false,
     "host": "127.0.0.1",
-    "port": 6379
+    "port": 6379,
+    "password": ""
   },
 
   "track_all_channels_by_default": true,
   "upload_attachments": false,
 
-  "exclude_channel_ids": [
-    ""
-  ],
+  "exclude_channel_ids": [""],
 
-  "banned_user_ids": [
-    ""
-  ]
+  "banned_user_ids": [""]
 }
