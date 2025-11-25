@@ -12,7 +12,7 @@ const redisClient = redis.createClient({
   password: config.redis.password || undefined,
   socket: {
     reconnectStrategy: () => 1000,
-  }
+  },
 });
 
 /**
