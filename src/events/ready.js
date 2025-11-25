@@ -1,10 +1,10 @@
-const { insertGuild } = require('../services/guild.service');
-const { handleError } = require('../shared');
+import { Events } from 'discord.js';
 
-const Guild = require('../models/guild.model');
-const { Events } = require('discord.js');
+import Guild from '../models/guild.model.js';
+import { insertGuild } from '../services/guild.service.js';
+import { handleError } from '../shared.js';
 
-module.exports = {
+export default {
   name: Events.ClientReady,
   once: true,
   /**
@@ -15,7 +15,7 @@ module.exports = {
 
     client.user.setActivity('you', { type: 'WATCHING' });
 
-    client.guilds.cache.map(async guild =>  {
+    client.guilds.cache.map(async (guild) => {
       try {
         const g = await Guild.findOne({ guild_id: guild.id }, '_id guild_id');
         if (!g) insertGuild(guild);
@@ -23,5 +23,5 @@ module.exports = {
         handleError(err);
       }
     });
-  }
+  },
 };

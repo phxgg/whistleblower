@@ -10,7 +10,8 @@ const handleError = (err) => {
  * @returns {string} random string of given length
  */
 const generateRandomString = (length) => {
-  const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const charset =
+    'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let result = '';
   for (let i = 0; i < length; i++) {
     result += charset.charAt(Math.floor(Math.random() * charset.length));
@@ -36,9 +37,4 @@ const BytesToMB = (bytes) => {
   return bytes / 1024 / 1024;
 };
 
-module.exports = {
-  handleError,
-  generateRandomString,
-  formatEmoji,
-  BytesToMB
-};
+export { handleError, generateRandomString, formatEmoji, BytesToMB };

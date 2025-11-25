@@ -1,7 +1,8 @@
-const { Events } = require('discord.js');
-const { insertGuild } = require('../services/guild.service');
+import { Events } from 'discord.js';
 
-module.exports = {
+import { insertGuild } from '../services/guild.service.js';
+
+export default {
   name: Events.GuildCreate,
   once: false,
   /**
@@ -9,5 +10,5 @@ module.exports = {
    */
   async execute(guild) {
     await insertGuild(guild);
-  }
+  },
 };

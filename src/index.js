@@ -1,19 +1,15 @@
-const path = require('node:path');
-const fs = require('node:fs');
-const logger = require('./services/logger.service')(module);
-const mongoose = require('mongoose');
-const redisService = require('./services/redis.service'); // define a variable so code gets executed once
+import fs from 'node:fs';
+import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 
-const {
-  Client,
-  GatewayIntentBits,
-  Partials,
-} = require('discord.js');
+import { Client, GatewayIntentBits, Partials } from 'discord.js';
+import mongoose from 'mongoose';
 
-const {
-  token,
-  mongodb_uri
-} = require('../config.json');
+import config from '../config.json' with { type: 'json' };
+import { createLogger } from './services/logger.service.js';
+import redisService from './services/redis.service.js';
+
+const logger = createLogger(import.meta);
 
 // const Paginator = require('./paginator.js');
 
@@ -33,16 +29,19 @@ const client = new Client({
     Partials.Reaction,
     Partials.User,
     Partials.GuildMember,
-  ]
+  ],
 });
 
 // MongoDB Database Connection
-mongoose.connect(mongodb_uri).then(() => {
-  logger.info('Successfully connected to db.');
-}).catch(err => {
-  logger.error(`Could not connect to db: ${err}`);
-  process.exit();
-});
+mongoose
+  .connect(config.mongodb_uri)
+  .then(() => {
+    logger.info('Successfully connected to db.');
+  })
+  .catch((err) => {
+    logger.error(`Could not connect to db: ${err}`);
+    process.exit();
+  });
 
 // prevent exit on error
 process.on('unhandledRejection', console.error);
@@ -59,20 +58,23 @@ client.on('warn', (e) => logger.warn(e));
 // client.on('debug', (e) => console.info(e));
 
 // load all event files
-const eventsPath = path.join(__dirname, 'events');
-const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+const eventsPath = path.join(import.meta.dirname, 'events');
+const eventFiles = fs
+  .readdirSync(eventsPath)
+  .filter((file) => file.endsWith('.js'));
 
 for (const file of eventFiles) {
   const filePath = path.join(eventsPath, file);
-  const event = require(filePath);
+  const fileUrl = pathToFileURL(filePath).href;
+  const module = await import(fileUrl);
+  const event = module.default;
 
   if (event.once) {
     client.once(event.name, (...args) => event.execute(...args));
-  }
-  else {
+  } else {
     client.on(event.name, (...args) => event.execute(...args));
   }
 }
 
 // start
-client.login(token);
+client.login(config.token);

@@ -1,18 +1,18 @@
-const mongoose = require('mongoose');
-const redis = require('redis');
-const logger = require('./logger.service')(module);
-const util = require('util');
+import mongoose from 'mongoose';
+import redis from 'redis';
 
-const {
-  redis_enable,
-  redis_host,
-  redis_port
-} = require('../../config.json');
+import config from '../../config.json' with { type: 'json' };
+import { createLogger } from './logger.service.js';
+
+const logger = createLogger(import.meta);
 
 const redisClient = redis.createClient({
-  host: redis_host,
-  port: redis_port,
-  retry_strategy: () => 1000
+  host: config.redis.host,
+  port: config.redis.port,
+  password: config.redis.password || undefined,
+  socket: {
+    reconnectStrategy: () => 1000,
+  },
 });
 
 /**
@@ -20,19 +20,22 @@ const redisClient = redis.createClient({
  * Setups the redis cache for mongoose
  */
 const setup = () => {
-  if (!redis_enable) {
-    mongoose.Query.prototype.cache = function() {
+  if (!config.redis.enable) {
+    mongoose.Query.prototype.cache = function () {
       return this;
     };
     return;
   }
 
-  redisClient.connect().then(() => {
-    logger.info('Redis connected');
-  }).catch(err => {
-    logger.error(`Could not connect to redis: ${err}`);
-    process.exit();
-  });
+  redisClient
+    .connect()
+    .then(() => {
+      logger.info('Redis connected');
+    })
+    .catch((err) => {
+      logger.error(`Could not connect to redis: ${err}`);
+      process.exit();
+    });
 
   // redisClient.hGet = util.promisify(redisClient.hGet);
   const exec = mongoose.Query.prototype.exec;
@@ -44,13 +47,13 @@ const setup = () => {
     return this;
   };
 
-  mongoose.Query.prototype.exec = async function() {
+  mongoose.Query.prototype.exec = async function () {
     if (!this.useCache) {
       return await exec.apply(this, arguments);
     }
 
     const key = JSON.stringify({
-      ...this.getQuery()
+      ...this.getQuery(),
     });
 
     const cacheValue = await redisClient.hGet(this.hashKey, key);
@@ -60,7 +63,7 @@ const setup = () => {
 
       logger.info('Response from Redis');
       return Array.isArray(doc)
-        ? doc.map(d => new this.model(d))
+        ? doc.map((d) => new this.model(d))
         : new this.model(doc);
     }
 
@@ -78,7 +81,7 @@ const setup = () => {
  * @param {string} hashKey
  */
 const clearKey = (hashKey) => {
-  if (!redis_enable) return;
+  if (!config.redis.enable) return;
   redisClient.del(JSON.stringify(hashKey));
 };
 
@@ -86,12 +89,12 @@ const clearKey = (hashKey) => {
  * Disconnect from redis
  */
 const disconnect = () => {
-  if (!redis_enable) return;
+  if (!config.redis.enable) return;
   logger.info('Closing redis connection');
-  redisClient.disconnect();
+  redisClient.destroy();
 };
 
-module.exports = {
+export default {
   setup,
   clearKey,
   disconnect,

@@ -1,9 +1,11 @@
-const { handleError, BytesToMB } = require('../shared');
-const axios = require('axios');
-const FormData = require('form-data');
-const logger = require('./logger.service')(module);
+import axios from 'axios';
+import FormData from 'form-data';
 
-const { upload_attachments } = require('../../config.json');
+import config from '../../config.json' with { type: 'json' };
+import { BytesToMB } from '../shared.js';
+import { createLogger } from './logger.service.js';
+
+const logger = createLogger(import.meta);
 
 /**
  * @param {string} msg
@@ -11,6 +13,21 @@ const { upload_attachments } = require('../../config.json');
  */
 const noUpload = (msg) => {
   return { link: msg };
+};
+
+/**
+ * Wrap a function to retry n times on failure
+ * @param {number} retries Number of retries
+ * @param {Function} fn Function to retry
+ * @returns
+ */
+const retryFn = async (retries, fn) => {
+  return fn().catch((err) => {
+    if (retries <= 0) {
+      throw err;
+    }
+    return retryFn(retries - 1, fn);
+  });
 };
 
 /**
@@ -22,7 +39,7 @@ const noUpload = (msg) => {
  */
 const uploadAttachment = async (attachment) => {
   // Only enable if upload_attachments is true
-  if (!upload_attachments) {
+  if (!config.upload_attachments) {
     return noUpload(attachment.url); // return attachment url
   }
 
@@ -34,14 +51,16 @@ const uploadAttachment = async (attachment) => {
     return noUpload(attachment.url);
   }
 
-  const fileName = attachment.url.substring(attachment.url.lastIndexOf('/') + 1);
+  const fileName = attachment.url.substring(
+    attachment.url.lastIndexOf('/') + 1
+  );
 
   try {
     // Get the attachment data
     const res = await axios({
       method: 'GET',
       url: attachment.url,
-      responseType: 'stream'
+      responseType: 'stream',
     });
 
     const stream = res.data;
@@ -53,14 +72,16 @@ const uploadAttachment = async (attachment) => {
     formData.append('read_count', 1000000);
 
     // axios post to upload file to api
-    const upload = await axios({
-      method: 'POST',
-      url: 'https://safenote.co/api/file',
-      responseType: 'json',
-      data: formData,
-      maxContentLength: Infinity,
-      maxBodyLength: Infinity
-    });
+    const upload = await retryFn(3, () =>
+      axios({
+        method: 'POST',
+        url: 'https://safenote.co/api/file',
+        responseType: 'json',
+        data: formData,
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity,
+      })
+    );
 
     if (!upload.data?.success) {
       logger.warn(`Attachment upload was not successful.`);
@@ -75,6 +96,4 @@ const uploadAttachment = async (attachment) => {
   }
 };
 
-module.exports = {
-  uploadAttachment
-};
+export { uploadAttachment };

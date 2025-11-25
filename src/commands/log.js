@@ -1,14 +1,18 @@
-const { SlashCommandBuilder, ChannelType, InteractionContextType } = require('discord.js');
+import {
+  ChannelType,
+  InteractionContextType,
+  SlashCommandBuilder,
+} from 'discord.js';
 
-const data = new SlashCommandBuilder()
+export const data = new SlashCommandBuilder()
   .setName('log')
   .setDescription('Setup a logging channel for a specific event')
   .setContexts([InteractionContextType.Guild])
-  .addSubcommand(subcommand =>
+  .addSubcommand((subcommand) =>
     subcommand
       .setName('message_delete')
       .setDescription('Setup a logging channel for deleted messages')
-      .addChannelOption(option =>
+      .addChannelOption((option) =>
         option
           .setRequired(true)
           .addChannelTypes(ChannelType.GuildText)
@@ -16,11 +20,11 @@ const data = new SlashCommandBuilder()
           .setDescription('Channel to log deleted messages')
       )
   )
-  .addSubcommand(subcommand =>
+  .addSubcommand((subcommand) =>
     subcommand
       .setName('message_update')
       .setDescription('Setup a logging channel for edited messages')
-      .addChannelOption(option =>
+      .addChannelOption((option) =>
         option
           .setRequired(true)
           .addChannelTypes(ChannelType.GuildText)
@@ -28,7 +32,3 @@ const data = new SlashCommandBuilder()
           .setDescription('Channel to log edited messages')
       )
   );
-
-module.exports = {
-  data
-};

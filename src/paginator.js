@@ -1,16 +1,8 @@
-const {
-  CommandInteraction,
-  ButtonInteraction,
-  InteractionCollector,
-  Message,
-  MessageActionRow,
-  MessageButton,
-  MessageEditOptions,
-} = require('discord.js');
+import { MessageActionRow, MessageButton } from 'discord.js';
 
-module.exports = class Paginator {
+class Paginator {
   /**
-   * @param {MessageEditOptions[]} data Array with edit options for each page.
+   * @param {import('discord.js').MessageEditOptions[]} data Array with edit options for each page.
    */
   constructor(data) {
     if (!data?.length)
@@ -31,14 +23,8 @@ module.exports = class Paginator {
         .setCustomId('currentPage')
         .setStyle('SECONDARY')
         .setDisabled(true),
-      new MessageButton()
-        .setCustomId('next')
-        .setLabel('>')
-        .setStyle('PRIMARY'),
-      new MessageButton()
-        .setCustomId('last')
-        .setLabel('>>')
-        .setStyle('PRIMARY')
+      new MessageButton().setCustomId('next').setLabel('>').setStyle('PRIMARY'),
+      new MessageButton().setCustomId('last').setLabel('>>').setStyle('PRIMARY')
     );
     this.stopRow = new MessageActionRow().addComponents(
       new MessageButton()
@@ -51,9 +37,9 @@ module.exports = class Paginator {
   /**
    * Starts the paginator.
    * @param {object} options
-   * @param {CommandInteraction} options.interaction
+   * @param {import('discord.js').CommandInteraction} options.interaction
    * @param {number=} options.time
-   * @returns {Promise<Message>}
+   * @returns {Promise<import('discord.js').Message>}
    */
   async start({ interaction, time = 30000 }) {
     let message = await interaction.reply({
@@ -75,8 +61,8 @@ module.exports = class Paginator {
 
   /**
    * Listener for when a button is clicked.
-   * @param {ButtonInteraction} interaction
-   * @param {InteractionCollector} collector
+   * @param {import('discord.js').ButtonInteraction} interaction
+   * @param {import('discord.js').InteractionCollector} collector
    * @returns {Promise<void>}
    */
   async onClicked(interaction, collector) {
@@ -111,7 +97,7 @@ module.exports = class Paginator {
 
   /**
    * Listener for when the collector ends.
-   * @param {CommandInteraction} interaction
+   * @param {import('discord.js').CommandInteraction} interaction
    * @returns {Promise<void>}
    */
   async onEnd(interaction) {
@@ -130,4 +116,6 @@ module.exports = class Paginator {
       .setLabel(`${number + 1}/${this.data.length}`);
     return { ...this.data[number], components: [this.row, this.stopRow] };
   }
-};
+}
+
+export default Paginator;
