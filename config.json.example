@@ -3,9 +3,11 @@
   "token": "",
   "application_id": "",
   
-  "redis_enable": false,
-  "redis_host": "127.0.0.1",
-  "redis_port": 6379,
+  "redis": {
+    "enable": false,
+    "host": "127.0.0.1",
+    "port": 6379
+  },
 
   "track_all_channels_by_default": true,
   "upload_attachments": false,

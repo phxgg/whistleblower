@@ -1,7 +1,7 @@
-const { Events } = require('discord.js');
-const { deleteGuild } = require('../services/guild.service');
+import { Events } from 'discord.js';
+import { deleteGuild } from '../services/guild.service.js';
 
-module.exports = {
+export default {
   name: Events.GuildDelete,
   once: false,
   /**

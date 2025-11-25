@@ -36,9 +36,9 @@ const BytesToMB = (bytes) => {
   return bytes / 1024 / 1024;
 };
 
-module.exports = {
+export {
   handleError,
   generateRandomString,
   formatEmoji,
-  BytesToMB
+  BytesToMB,
 };

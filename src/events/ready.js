@@ -1,10 +1,9 @@
-const { insertGuild } = require('../services/guild.service');
-const { handleError } = require('../shared');
+import { Events } from 'discord.js';
+import { insertGuild } from '../services/guild.service.js';
+import Guild from '../models/guild.model.js';
+import { handleError } from '../shared.js';
 
-const Guild = require('../models/guild.model');
-const { Events } = require('discord.js');
-
-module.exports = {
+export default {
   name: Events.ClientReady,
   once: true,
   /**

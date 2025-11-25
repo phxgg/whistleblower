@@ -1,17 +1,14 @@
-const { Events } = require("discord.js");
+import { Events } from 'discord.js';
+import config from '../../config.json' with { type: 'json' };
 
-const {
-  banned_user_ids
-} = require('../../config.json');
-
-module.exports = {
+export default {
   name: Events.GuildMemberAdd,
   once: false,
   /**
    * @param {import('discord.js').GuildMember} member
    */
   async execute(member) {
-    const bannedUserIds = banned_user_ids || [];
+    const bannedUserIds = config.banned_user_ids || [];
     if (bannedUserIds.includes(member.id)) {
       return member.ban({
         reason: "Banned user tried to join the server",

@@ -1,19 +1,13 @@
-const path = require('node:path');
-const fs = require('node:fs');
-const logger = require('./services/logger.service')(module);
-const mongoose = require('mongoose');
-const redisService = require('./services/redis.service'); // define a variable so code gets executed once
+import path from 'node:path';
+import fs from 'node:fs';
+import { Client, GatewayIntentBits, Partials } from 'discord.js';
+import mongoose from 'mongoose';
+import redisService from './services/redis.service.js';
+import { pathToFileURL } from 'node:url';
+import { createLogger } from './services/logger.service.js';
+import config from '../config.json' with { type: 'json' };
 
-const {
-  Client,
-  GatewayIntentBits,
-  Partials,
-} = require('discord.js');
-
-const {
-  token,
-  mongodb_uri
-} = require('../config.json');
+const logger = createLogger(import.meta);
 
 // const Paginator = require('./paginator.js');
 
@@ -37,7 +31,7 @@ const client = new Client({
 });
 
 // MongoDB Database Connection
-mongoose.connect(mongodb_uri).then(() => {
+mongoose.connect(config.mongodb_uri).then(() => {
   logger.info('Successfully connected to db.');
 }).catch(err => {
   logger.error(`Could not connect to db: ${err}`);
@@ -59,12 +53,14 @@ client.on('warn', (e) => logger.warn(e));
 // client.on('debug', (e) => console.info(e));
 
 // load all event files
-const eventsPath = path.join(__dirname, 'events');
+const eventsPath = path.join(import.meta.dirname, 'events');
 const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 
 for (const file of eventFiles) {
   const filePath = path.join(eventsPath, file);
-  const event = require(filePath);
+  const fileUrl = pathToFileURL(filePath).href;
+  const module = await import(fileUrl);
+  const event = module.default;
 
   if (event.once) {
     client.once(event.name, (...args) => event.execute(...args));
@@ -75,4 +71,4 @@ for (const file of eventFiles) {
 }
 
 // start
-client.login(token);
+client.login(config.token);

@@ -1,25 +1,27 @@
-const winston = require('winston');
-const path = require('node:path');
+import winston from 'winston';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 // Logger Service
 
 /**
- * @param {NodeModule} callingModule
+ * @param {ImportMeta} importMeta
  * @returns {string} label for the logger
  */
-const getLabel = (callingModule) => {
-  const parts = callingModule.filename.split(path.sep);
+const getLabel = (importMeta) => {
+  const filename = fileURLToPath(importMeta.url);
+  const parts = filename.split(path.sep);
   return path.join(parts[parts.length - 2], parts.pop());
 };
 
 /**
- * @param {NodeModule} callingModule
+ * @param {ImportMeta} importMeta
  * @returns {winston.Logger}
  */
-module.exports = (callingModule) => {
+export const createLogger = (importMeta) => {
   return new winston.createLogger({
     format: winston.format.combine(
-      winston.format.label({ label: getLabel(callingModule) }),
+      winston.format.label({ label: getLabel(importMeta) }),
       winston.format.timestamp({
         format: "YYYY/MM/DD hh:mm:ss"
       }),
@@ -36,4 +38,6 @@ module.exports = (callingModule) => {
       new winston.transports.File({ filename: 'logs/combined.log' }),
     ]
   });
-};
+}
+
+export default createLogger;

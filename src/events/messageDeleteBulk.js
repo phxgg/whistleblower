@@ -1,9 +1,8 @@
-const { EmbedBuilder } = require('discord.js');
-const { getGuild } = require('../services/guild.service');
-const { uploadAttachment } = require('../services/attachments.service');
-const { Events } = require('discord.js');
+import { EmbedBuilder, Events } from 'discord.js';
+import { getGuild } from '../services/guild.service.js';
+import { uploadAttachment } from '../services/attachments.service.js';
 
-module.exports = {
+export default {
   name: Events.MessageBulkDelete,
   once: false,
   /**

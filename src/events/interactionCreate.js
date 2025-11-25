@@ -1,12 +1,12 @@
-const { Events } = require('discord.js');
-const {
+import { Events } from 'discord.js';
+import {
   getTrackChannels,
   addToTrackChannels,
   addToLoggingChannels,
   removeFromTrackChannels
-} = require('../services/guild.service');
+} from '../services/guild.service.js';
 
-module.exports = {
+export default {
   name: Events.InteractionCreate,
   once: false,
   /**

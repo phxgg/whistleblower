@@ -1,9 +1,10 @@
-const { handleError, BytesToMB } = require('../shared');
-const axios = require('axios');
-const FormData = require('form-data');
-const logger = require('./logger.service')(module);
+import { BytesToMB } from '../shared.js';
+import axios from 'axios';
+import FormData from 'form-data';
+import { createLogger } from './logger.service.js';
+import config from '../../config.json' with { type: 'json' };
 
-const { upload_attachments } = require('../../config.json');
+const logger = createLogger(import.meta);
 
 /**
  * @param {string} msg
@@ -37,7 +38,7 @@ const retryFn = async (retries, fn) => {
  */
 const uploadAttachment = async (attachment) => {
   // Only enable if upload_attachments is true
-  if (!upload_attachments) {
+  if (!config.upload_attachments) {
     return noUpload(attachment.url); // return attachment url
   }
 
@@ -92,6 +93,6 @@ const uploadAttachment = async (attachment) => {
   }
 };
 
-module.exports = {
+export {
   uploadAttachment
 };

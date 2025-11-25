@@ -1,6 +1,6 @@
-const { SlashCommandBuilder, ChannelType, InteractionContextType } = require('discord.js');
+import { SlashCommandBuilder, ChannelType, InteractionContextType } from 'discord.js';
 
-const data = new SlashCommandBuilder()
+export const data = new SlashCommandBuilder()
   .setName('log')
   .setDescription('Setup a logging channel for a specific event')
   .setContexts([InteractionContextType.Guild])
@@ -28,7 +28,3 @@ const data = new SlashCommandBuilder()
           .setDescription('Channel to log edited messages')
       )
   );
-
-module.exports = {
-  data
-};

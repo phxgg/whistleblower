@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
-var schema = mongoose.Schema({
+const schema = mongoose.Schema({
   guild_id: {
     type: String,
     required: true
@@ -27,6 +27,6 @@ schema.method('toJSON', function () {
   return object;
 });
 
-const Guild = mongoose.model('Guild', schema);
+const Guild = mongoose.models.Guild || mongoose.model('Guild', schema);
 
-module.exports = Guild;
+export default Guild;

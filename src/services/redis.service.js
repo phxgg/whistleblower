@@ -1,17 +1,13 @@
-const mongoose = require('mongoose');
-const redis = require('redis');
-const logger = require('./logger.service')(module);
-const util = require('util');
+import mongoose from 'mongoose';
+import redis from 'redis';
+import { createLogger } from './logger.service.js';
+import config from '../../config.json' with { type: 'json' };
 
-const {
-  redis_enable,
-  redis_host,
-  redis_port
-} = require('../../config.json');
+const logger = createLogger(import.meta);
 
 const redisClient = redis.createClient({
-  host: redis_host,
-  port: redis_port,
+  host: config.redis.host,
+  port: config.redis.port,
   retry_strategy: () => 1000
 });
 
@@ -20,7 +16,7 @@ const redisClient = redis.createClient({
  * Setups the redis cache for mongoose
  */
 const setup = () => {
-  if (!redis_enable) {
+  if (!config.redis.enable) {
     mongoose.Query.prototype.cache = function() {
       return this;
     };
@@ -88,11 +84,11 @@ const clearKey = (hashKey) => {
 const disconnect = () => {
   if (!redis_enable) return;
   logger.info('Closing redis connection');
-  redisClient.disconnect();
+  redisClient.destroy();
 };
 
-module.exports = {
+export default {
   setup,
   clearKey,
   disconnect,
-};
+}

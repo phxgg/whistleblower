@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "description": "Discord bot that keeps track of everything happening on your server.",
   "main": "src/index.js",
+  "type": "module",
   "scripts": {
-    "register": "node scripts/register.js",
-    "delete": "node scripts/delete.js",
+    "register": "node scripts/register.mjs",
+    "delete": "node scripts/delete.mjs",
     "bot": "node src/index.js",
     "dev": "nodemon src/index.js",
     "ncu:check": "npx npm-check-updates",

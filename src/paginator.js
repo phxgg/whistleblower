@@ -1,4 +1,4 @@
-const {
+import {
   CommandInteraction,
   ButtonInteraction,
   InteractionCollector,
@@ -6,9 +6,9 @@ const {
   MessageActionRow,
   MessageButton,
   MessageEditOptions,
-} = require('discord.js');
+} from 'discord.js';
 
-module.exports = class Paginator {
+class Paginator {
   /**
    * @param {MessageEditOptions[]} data Array with edit options for each page.
    */
@@ -131,3 +131,5 @@ module.exports = class Paginator {
     return { ...this.data[number], components: [this.row, this.stopRow] };
   }
 };
+
+export default Paginator;

@@ -2,18 +2,16 @@
  * This script will delete all global commands for the bot.
  */
 
-const { REST } = require('@discordjs/rest');
-const { Routes } = require('discord.js')
-const path = require('node:path');
+import { REST } from '@discordjs/rest';
+import { Routes } from 'discord.js';
+import config from '../config.json' with { type: 'json' };
 
-const { token, application_id } = require('../config.json');
-
-const rest = new REST({ version: '10' }).setToken(token);
+const rest = new REST({ version: '10' }).setToken(config.token);
 
 (async () => {
   try {
     const data = await rest.put(
-      Routes.applicationCommands(application_id),
+      Routes.applicationCommands(config.application_id),
       { body: [] },
     );
 

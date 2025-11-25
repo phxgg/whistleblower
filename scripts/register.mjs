@@ -2,12 +2,12 @@
  * This script will register all global commands for the bot.
  */
 
-const { REST } = require('@discordjs/rest');
-// const { Routes } = require('discord-api-types/v9');
-const { Routes } = require('discord.js')
-const path = require('node:path');
-
-const { token, application_id } = require('../config.json');
+import { REST } from '@discordjs/rest';
+import { Routes } from 'discord.js';
+import path from 'node:path';
+import { pathToFileURL } from 'node:url';
+import fs from 'node:fs';
+import config from '../config.json' with { type: 'json' };
 
 // const guild_id = process.argv[2];
 
@@ -16,27 +16,26 @@ const { token, application_id } = require('../config.json');
 //   process.exit(1);
 // }
 
-const fs = require('node:fs');
-
 const commands = [];
-const commandsPath = path.join(__dirname, '../src/commands');
+const commandsPath = path.join(import.meta.dirname, '../src/commands');
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 
 for (const file of commandFiles) {
   const filePath = path.join(commandsPath, file);
-  const command = require(filePath);
+  const fileUrl = pathToFileURL(filePath).href;
+  const command = await import(fileUrl);
   commands.push(command.data.toJSON());
 }
 
-const rest = new REST({ version: '10' }).setToken(token);
+const rest = new REST({ version: '10' }).setToken(config.token);
 
 (async () => {
   try {
     console.log(`[whistleblower] Started refreshing ${commands.length} application (/) commands.`)
 
     const data = await rest.put(
-      // Routes.applicationGuildCommands(application_id, guild_id),
-      Routes.applicationCommands(application_id),
+      // Routes.applicationGuildCommands(config.application_id, guild_id),
+      Routes.applicationCommands(config.application_id),
       { body: commands },
     );
 
