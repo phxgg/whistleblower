@@ -14,6 +14,21 @@ const noUpload = (msg) => {
 };
 
 /**
+ * Wrap a function to retry n times on failure
+ * @param {number} retries Number of retries
+ * @param {Function} fn Function to retry
+ * @returns 
+ */
+const retryFn = async (retries, fn) => {
+  return fn().catch((err) => {
+    if (retries <= 0) {
+      throw err;
+    }
+    return retryFn(retries - 1, fn);
+  });
+}
+
+/**
  * Upload attachment to file sharing api.
  * Sometimes, the attachment is instantly deleted from the discord cdn,
  * before we can even download it. In that case, the file is not uploaded.
@@ -53,14 +68,16 @@ const uploadAttachment = async (attachment) => {
     formData.append('read_count', 1000000);
 
     // axios post to upload file to api
-    const upload = await axios({
-      method: 'POST',
-      url: 'https://safenote.co/api/file',
-      responseType: 'json',
-      data: formData,
-      maxContentLength: Infinity,
-      maxBodyLength: Infinity
-    });
+    const upload = await retryFn(3, () =>
+      axios({
+        method: 'POST',
+        url: 'https://safenote.co/api/file',
+        responseType: 'json',
+        data: formData,
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity
+      })
+    );
 
     if (!upload.data?.success) {
       logger.warn(`Attachment upload was not successful.`);
