@@ -8,19 +8,20 @@ import { handleError } from '../shared.js';
 /**
  * @param {string} guildId
  * @param {string} projection
- * @returns {Object} guild object
+ * @returns {Promise<Object>} guild object
  */
-const getGuild = async (guildId, projection) => {
+export async function getGuild(guildId, projection) {
   let g = await Guild.findOne({ guild_id: guildId }, projection).cache();
   if (!g) return {};
   return g;
-};
+}
 
 /**
  * Inserts a new guild into the database
  * @param {import('discord.js').Guild} guild
+ * @returns {Promise<void>}
  */
-const insertGuild = async (guild) => {
+export async function insertGuild(guild) {
   const guildObject = {
     guild_id: guild.id,
     guild_owner_id: guild.ownerId,
@@ -49,40 +50,42 @@ const insertGuild = async (guild) => {
   } catch (err) {
     handleError(err);
   }
-};
+}
 
 /**
  * Deletes a guild from the database
  * @param {string} guildId
+ * @returns {Promise<void>}
  */
-const deleteGuild = async (guildId) => {
+export async function deleteGuild(guildId) {
   try {
     await Guild.deleteOne({ guild_id: guildId });
   } catch (err) {
     handleError(err);
   }
   redisService.clearKey(Guild.collection.collectionName);
-};
+}
 
 /**
  * @param {string} guildId
- * @returns {Object} logging channels object
+ * @returns {Promise<Object>} logging channels object
  */
-const getLoggingChannels = async (guildId) => {
+export async function getLoggingChannels(guildId) {
   let g = await Guild.findOne({ guild_id: guildId }, 'logging_channels')
     .exec()
     .catch((err) => handleError(err));
   if (!g) return {};
   return g.logging_channels;
-};
+}
 
 /**
  * Adds a new logging channel to the database
  * @param {string} event
  * @param {string} guildId
  * @param {string} channelId
+ * @returns {Promise<void>}
  */
-const addToLoggingChannels = async (event, guildId, channelId) => {
+export async function addToLoggingChannels(event, guildId, channelId) {
   const updateQuery = { $set: { [`logging_channels.${event}`]: channelId } };
   try {
     await Guild.updateOne({ guild_id: guildId }, updateQuery);
@@ -90,27 +93,28 @@ const addToLoggingChannels = async (event, guildId, channelId) => {
     handleError(err);
   }
   redisService.clearKey(Guild.collection.collectionName);
-};
+}
 
 /**
  * Get all track channels for a guild
  * @param {string} guildId
- * @returns {Array<string>}
+ * @returns {Promise<Array<string>>}
  */
-const getTrackChannels = async (guildId) => {
+export async function getTrackChannels(guildId) {
   let g = await Guild.findOne({ guild_id: guildId }, 'track_channels')
     .exec()
     .catch((err) => handleError(err));
   if (!g) return [];
   return g.track_channels;
-};
+}
 
 /**
  * Adds a new channel, for tracking, to the database
  * @param {string} guildId
  * @param {string} channelId
+ * @returns {Promise<void>}
  */
-const addToTrackChannels = async (guildId, channelId) => {
+export async function addToTrackChannels(guildId, channelId) {
   const updateQuery = { $push: { track_channels: channelId } };
   try {
     await Guild.updateOne({ guild_id: guildId }, updateQuery);
@@ -118,14 +122,15 @@ const addToTrackChannels = async (guildId, channelId) => {
     handleError(err);
   }
   redisService.clearKey(Guild.collection.collectionName);
-};
+}
 
 /**
  * Removes a tracking channel from the database
  * @param {string} guildId
  * @param {string} channelId
+ * @returns {Promise<void>}
  */
-const removeFromTrackChannels = async (guildId, channelId) => {
+export async function removeFromTrackChannels(guildId, channelId) {
   const updateQuery = { $pull: { track_channels: channelId } };
   try {
     await Guild.updateOne({ guild_id: guildId }, updateQuery);
@@ -133,15 +138,4 @@ const removeFromTrackChannels = async (guildId, channelId) => {
     handleError(err);
   }
   redisService.clearKey(Guild.collection.collectionName);
-};
-
-export {
-  getGuild,
-  insertGuild,
-  deleteGuild,
-  getLoggingChannels,
-  addToLoggingChannels,
-  getTrackChannels,
-  addToTrackChannels,
-  removeFromTrackChannels,
-};
+}

@@ -11,33 +11,33 @@ const logger = createLogger(import.meta);
  * @param {string} msg
  * @returns {Object} { link: '...' }
  */
-const noUpload = (msg) => {
+function noUpload(msg) {
   return { link: msg };
-};
+}
 
 /**
  * Wrap a function to retry n times on failure
  * @param {number} retries Number of retries
  * @param {Function} fn Function to retry
- * @returns
+ * @returns {Promise<any>}
  */
-const retryFn = async (retries, fn) => {
+async function retryFn(retries, fn) {
   return fn().catch((err) => {
     if (retries <= 0) {
       throw err;
     }
     return retryFn(retries - 1, fn);
   });
-};
+}
 
 /**
  * Upload attachment to file sharing api.
  * Sometimes, the attachment is instantly deleted from the discord cdn,
  * before we can even download it. In that case, the file is not uploaded.
  * @param {import('discord.js').Attachment} attachment
- * @returns {{ success: boolean, key: string, link: string }}
+ * @returns {Promise<{ success?: boolean, key?: string, link: string }>}
  */
-const uploadAttachment = async (attachment) => {
+export async function uploadAttachment(attachment) {
   // Only enable if upload_attachments is true
   if (!config.upload_attachments) {
     return noUpload(attachment.url); // return attachment url
@@ -94,6 +94,4 @@ const uploadAttachment = async (attachment) => {
     logger.error(`Error uploading attachment`, err);
     return noUpload(attachment.url);
   }
-};
-
-export { uploadAttachment };
+}

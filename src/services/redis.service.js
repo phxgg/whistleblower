@@ -19,7 +19,7 @@ const redisClient = redis.createClient({
  * Call this function only once in the application
  * Setups the redis cache for mongoose
  */
-const setup = () => {
+export function setup() {
   if (!config.redis.enable) {
     mongoose.Query.prototype.cache = function () {
       return this;
@@ -74,28 +74,22 @@ const setup = () => {
     logger.info('Response from MongoDB');
     return result;
   };
-};
+}
 
 /**
  * Clears the cache for the given hashKey
  * @param {string} hashKey
  */
-const clearKey = (hashKey) => {
+export function clearKey(hashKey) {
   if (!config.redis.enable) return;
   redisClient.del(JSON.stringify(hashKey));
-};
+}
 
 /**
  * Disconnect from redis
  */
-const disconnect = () => {
+export function disconnect() {
   if (!config.redis.enable) return;
   logger.info('Closing redis connection');
   redisClient.destroy();
-};
-
-export default {
-  setup,
-  clearKey,
-  disconnect,
-};
+}
