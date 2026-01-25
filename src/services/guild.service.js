@@ -8,11 +8,11 @@ import { handleError } from '../shared.js';
 /**
  * @param {string} guildId
  * @param {string} projection
- * @returns {Promise<Object>} guild object
+ * @returns {Promise<Object | null>} guild object
  */
 export async function getGuild(guildId, projection) {
   let g = await Guild.findOne({ guild_id: guildId }, projection).cache();
-  if (!g) return {};
+  if (!g) return null;
   return g;
 }
 
@@ -68,13 +68,13 @@ export async function deleteGuild(guildId) {
 
 /**
  * @param {string} guildId
- * @returns {Promise<Object>} logging channels object
+ * @returns {Promise<Object | null>} logging channels object
  */
 export async function getLoggingChannels(guildId) {
   let g = await Guild.findOne({ guild_id: guildId }, 'logging_channels')
     .exec()
     .catch((err) => handleError(err));
-  if (!g) return {};
+  if (!g) return null;
   return g.logging_channels;
 }
 
