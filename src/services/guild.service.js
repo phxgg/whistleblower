@@ -1,4 +1,4 @@
-import { ChannelType } from 'discord.js';
+import { ChannelType, PermissionsBitField } from 'discord.js';
 
 import config from '../../config.json' with { type: 'json' };
 import Guild from '../models/guild.model.js';
@@ -138,4 +138,68 @@ export async function removeFromTrackChannels(guildId, channelId) {
     handleError(err);
   }
   redisService.clearKey(Guild.collection.collectionName);
+}
+
+export async function createWhistleblowerCategory(guild) {
+  try {
+    // Create a new category in the Guild for whistleblower logging
+    // This category should have a permission overwrite that denies @everyone from viewing it
+    // and allows only users with the "Administrator" permission to view it
+    // The category should also have two text channels called "message-deleted" and "message-edited"
+    const loggingCategory = await guild.channels.create({
+      name: '🕵Whistleblower',
+      type: ChannelType.GuildCategory,
+      permissionOverwrites: [
+        {
+          id: guild.roles.everyone,
+          deny: [PermissionsBitField.Flags.ViewChannel],
+        },
+      ],
+    });
+
+    /**
+     * @type {Array<{channel: import('discord.js').GuildChannel, event: 'message_delete' | 'message_update'}>}
+     */
+    const channels = [];
+
+    // Create the "message-deleted" channel
+    const messageDeletedChannel = await guild.channels.create({
+      name: '❌message-deleted',
+      type: ChannelType.GuildText,
+      parent: loggingCategory.id,
+    });
+    channels.push({
+      channel: messageDeletedChannel,
+      event: 'message_delete',
+    });
+
+    // Create the "message-edited" channel
+    const messageEditedChannel = await guild.channels.create({
+      name: '✍message-edited',
+      type: ChannelType.GuildText,
+      parent: loggingCategory.id,
+    });
+    channels.push({ channel: messageEditedChannel, event: 'message_update' });
+
+    for (const obj of channels) {
+      // Add the channel to the guild's logging_channels object in the database
+      addToLoggingChannels(obj.event, guild.id, obj.channel.id);
+      // Lock the permissions for the channel to match the category
+      obj.channel
+        .lockPermissions()
+        .then(() => {
+          console.log(
+            `Locked permissions for channel ${obj.channel.name} in guild ${guild.name}`
+          );
+        })
+        .catch((err) => {
+          console.error(
+            `Failed to lock permissions for channel ${obj.channel.name} in guild ${guild.name}:`,
+            err
+          );
+        });
+    }
+  } catch (err) {
+    handleError(err);
+  }
 }
