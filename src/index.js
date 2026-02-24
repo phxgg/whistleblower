@@ -7,13 +7,13 @@ import mongoose from 'mongoose';
 
 import config from '../config.json' with { type: 'json' };
 import { createLogger } from './services/logger.service.js';
-import { setup as redisSetup, disconnect as redisDisconnect } from './services/redis.service.js';
+import redisService from './services/redis.service.js';
 
 const logger = createLogger(import.meta);
 
 // const Paginator = require('./paginator.js');
 
-redisSetup();
+redisService.setup();
 
 const client = new Client({
   intents: [
@@ -48,7 +48,7 @@ process.on('unhandledRejection', console.error);
 process.on('uncaughtException', console.error);
 process.on('beforeExit', (code) => {
   logger.info('Closing db connection.');
-  redisDisconnect();
+  redisService.disconnect();
   mongoose.connection.close();
 });
 
