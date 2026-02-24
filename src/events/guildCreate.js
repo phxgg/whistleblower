@@ -1,6 +1,9 @@
 import { Events } from 'discord.js';
 
-import { insertGuild } from '../services/guild.service.js';
+import {
+  createWhistleblowerCategory,
+  insertGuild,
+} from '../services/guild.service.js';
 
 export default {
   name: Events.GuildCreate,
@@ -9,6 +12,9 @@ export default {
    * @param {import('discord.js').Guild} guild
    */
   async execute(guild) {
+    // When the bot joins a new guild, insert it into the database
     await insertGuild(guild);
+    // Create Whistleblower category
+    await createWhistleblowerCategory(guild);
   },
 };
