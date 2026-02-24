@@ -93,3 +93,9 @@ export function disconnect() {
   logger.info('Closing redis connection');
   redisClient.destroy();
 }
+
+export default {
+  setup,
+  clearKey,
+  disconnect,
+}
