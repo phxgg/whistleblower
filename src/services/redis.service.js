@@ -98,4 +98,4 @@ export default {
   setup,
   clearKey,
   disconnect,
-}
+};
