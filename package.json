@@ -19,23 +19,23 @@
   "author": "phxgg",
   "license": "MIT",
   "dependencies": {
-    "axios": "^1.14.0",
-    "discord-api-types": "^0.38.43",
-    "discord.js": "^14.26.0",
+    "axios": "^1.15.0",
+    "discord-api-types": "^0.38.46",
+    "discord.js": "^14.26.3",
     "form-data": "^4.0.5",
     "mongodb": "^7.1.1",
-    "mongoose": "^9.3.3",
+    "mongoose": "^9.4.1",
     "nodemon": "^3.1.14",
-    "redis": "^5.11.0",
+    "redis": "^5.12.1",
     "winston": "^3.19.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@ianvs/prettier-plugin-sort-imports": "^4.7.1",
-    "eslint": "^10.1.0",
+    "eslint": "^10.2.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
-    "globals": "^17.4.0",
-    "prettier": "3.8.1"
+    "globals": "^17.5.0",
+    "prettier": "3.8.3"
   }
 }
