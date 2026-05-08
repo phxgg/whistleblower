@@ -11,14 +11,9 @@ const rest = new REST({ version: '10' }).setToken(config.token);
 
 (async () => {
   try {
-    const data = await rest.put(
-      Routes.applicationCommands(config.application_id),
-      { body: [] }
-    );
+    const data = await rest.put(Routes.applicationCommands(config.application_id), { body: [] });
 
-    console.log(
-      `[whistleblower] Successfully deleted all application (/) commands.`
-    );
+    console.log(`[whistleblower] Successfully deleted all application (/) commands.`);
   } catch (err) {
     console.error(err);
   }

@@ -23,13 +23,7 @@ const client = new Client({
     GatewayIntentBits.GuildMessageReactions,
     GatewayIntentBits.GuildMembers,
   ],
-  partials: [
-    Partials.Message,
-    Partials.Channel,
-    Partials.Reaction,
-    Partials.User,
-    Partials.GuildMember,
-  ],
+  partials: [Partials.Message, Partials.Channel, Partials.Reaction, Partials.User, Partials.GuildMember],
 });
 
 // MongoDB Database Connection
@@ -59,9 +53,7 @@ client.on('warn', (e) => logger.warn(e));
 
 // load all event files
 const eventsPath = path.join(import.meta.dirname, 'events');
-const eventFiles = fs
-  .readdirSync(eventsPath)
-  .filter((file) => file.endsWith('.js'));
+const eventFiles = fs.readdirSync(eventsPath).filter((file) => file.endsWith('.js'));
 
 for (const file of eventFiles) {
   const filePath = path.join(eventsPath, file);

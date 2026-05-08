@@ -26,8 +26,7 @@ export default {
         ephemeral: true,
       });
 
-    const channel =
-      interaction.options.getChannel('channel') || interaction.channel;
+    const channel = interaction.options.getChannel('channel') || interaction.channel;
 
     const trackChannels = await getTrackChannels(interaction.guild.id);
 
@@ -36,9 +35,7 @@ export default {
       const event = interaction.options.getSubcommand();
       await addToLoggingChannels(event, interaction.guild.id, channel.id);
 
-      interaction.editReply(
-        `:white_check_mark: Logging event \`${event}\` in ${channel}`
-      );
+      interaction.editReply(`:white_check_mark: Logging event \`${event}\` in ${channel}`);
     } else if (interaction.commandName === 'track') {
       // track
       if (trackChannels.indexOf(channel.id) !== -1) {
