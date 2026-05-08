@@ -16,9 +16,7 @@ export default {
           reason: 'Banned user tried to join the server',
         })
         .then(() => {
-          console.log(
-            `Banned ${member.user.username} for being a banned user.`
-          );
+          console.log(`Banned ${member.user.username} for being a banned user.`);
         })
         .catch((err) => {
           console.error(`Failed to ban ${member.user.username}:`, err);

@@ -35,8 +35,7 @@ export async function insertGuild(guild) {
 
     channels.map((channel) => {
       if (
-        (channel.type === ChannelType.GuildText ||
-          channel.type === ChannelType.GuildVoice) &&
+        (channel.type === ChannelType.GuildText || channel.type === ChannelType.GuildVoice) &&
         !config.exclude_channel_ids.includes(channel.id)
       ) {
         guildObject.track_channels.push(channel.id);
@@ -140,6 +139,10 @@ export async function removeFromTrackChannels(guildId, channelId) {
   redisService.clearKey(Guild.collection.collectionName);
 }
 
+/**
+ * Creates a new Admin-only category in the Guild for whistleblower logging
+ * @param {import('discord.js').Guild} guild
+ */
 export async function createWhistleblowerCategory(guild) {
   try {
     // Create a new category in the Guild for whistleblower logging
@@ -158,9 +161,9 @@ export async function createWhistleblowerCategory(guild) {
     });
 
     /**
-     * @type {Array<{channel: import('discord.js').GuildChannel, event: 'message_delete' | 'message_update'}>}
+     * @type {Array<{channel: import('discord.js').TextChannel, event: 'message_delete' | 'message_update'}>}
      */
-    const channels = [];
+    const eventToChannelMap = [];
 
     // Create the "message-deleted" channel
     const messageDeletedChannel = await guild.channels.create({
@@ -168,7 +171,7 @@ export async function createWhistleblowerCategory(guild) {
       type: ChannelType.GuildText,
       parent: loggingCategory.id,
     });
-    channels.push({
+    eventToChannelMap.push({
       channel: messageDeletedChannel,
       event: 'message_delete',
     });
@@ -179,24 +182,19 @@ export async function createWhistleblowerCategory(guild) {
       type: ChannelType.GuildText,
       parent: loggingCategory.id,
     });
-    channels.push({ channel: messageEditedChannel, event: 'message_update' });
+    eventToChannelMap.push({ channel: messageEditedChannel, event: 'message_update' });
 
-    for (const obj of channels) {
+    for (const x of eventToChannelMap) {
       // Add the channel to the guild's logging_channels object in the database
-      addToLoggingChannels(obj.event, guild.id, obj.channel.id);
+      addToLoggingChannels(x.event, guild.id, x.channel.id);
       // Lock the permissions for the channel to match the category
-      obj.channel
+      x.channel
         .lockPermissions()
         .then(() => {
-          console.log(
-            `Locked permissions for channel ${obj.channel.name} in guild ${guild.name}`
-          );
+          console.log(`Locked permissions for channel ${x.channel.name} in guild ${guild.name}`);
         })
         .catch((err) => {
-          console.error(
-            `Failed to lock permissions for channel ${obj.channel.name} in guild ${guild.name}:`,
-            err
-          );
+          console.error(`Failed to lock permissions for channel ${x.channel.name} in guild ${guild.name}:`, err);
         });
     }
   } catch (err) {

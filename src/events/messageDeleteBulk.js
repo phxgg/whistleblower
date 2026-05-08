@@ -11,21 +11,13 @@ export default {
    * @param {import('discord.js').Channel} channel
    */
   async execute(messages, channel) {
-    const guild = await getGuild(
-      channel.guild.id,
-      'logging_channels track_channels'
-    );
+    const guild = await getGuild(channel.guild.id, 'logging_channels track_channels');
     if (!guild) return;
 
     const loggingChannels = guild?.logging_channels;
     const trackChannels = guild?.track_channels;
 
-    if (
-      !loggingChannels?.message_delete ||
-      !trackChannels ||
-      !trackChannels.includes(channel.id)
-    )
-      return;
+    if (!loggingChannels?.message_delete || !trackChannels || !trackChannels.includes(channel.id)) return;
 
     for (const message of messages.values()) {
       if (message.partial) return; // content is null or deleted embed
@@ -61,11 +53,9 @@ export default {
         embed.setColor('#ff4040');
       }
 
-      await message.client.channels
-        .fetch(loggingChannels.message_delete)
-        .then((channel) => {
-          channel.send({ embeds: [embed] });
-        });
+      await message.client.channels.fetch(loggingChannels.message_delete).then((channel) => {
+        channel.send({ embeds: [embed] });
+      });
     }
   },
 };

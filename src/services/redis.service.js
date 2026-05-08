@@ -62,9 +62,7 @@ export function setup() {
       const doc = JSON.parse(cacheValue);
 
       logger.info('Response from Redis');
-      return Array.isArray(doc)
-        ? doc.map((d) => new this.model(d))
-        : new this.model(doc);
+      return Array.isArray(doc) ? doc.map((d) => new this.model(d)) : new this.model(doc);
     }
 
     const result = await exec.apply(this, arguments);

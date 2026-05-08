@@ -13,21 +13,13 @@ export default {
     if (message.partial) return; // content is null or deleted embed
     if (message.author.bot) return; // ignore bots
 
-    const guild = await getGuild(
-      message.guild.id,
-      'logging_channels track_channels'
-    );
+    const guild = await getGuild(message.guild.id, 'logging_channels track_channels');
     if (!guild) return;
 
     const loggingChannels = guild?.logging_channels;
     const trackChannels = guild?.track_channels;
 
-    if (
-      !loggingChannels?.message_delete ||
-      !trackChannels ||
-      !trackChannels.includes(message.channel.id)
-    )
-      return;
+    if (!loggingChannels?.message_delete || !trackChannels || !trackChannels.includes(message.channel.id)) return;
 
     const embed = new EmbedBuilder()
       .setAuthor({
@@ -59,10 +51,8 @@ export default {
       embed.setColor('#ff4040');
     }
 
-    await message.client.channels
-      .fetch(loggingChannels.message_delete)
-      .then((channel) => {
-        channel.send({ embeds: [embed] });
-      });
+    await message.client.channels.fetch(loggingChannels.message_delete).then((channel) => {
+      channel.send({ embeds: [embed] });
+    });
   },
 };

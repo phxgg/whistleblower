@@ -51,9 +51,7 @@ export async function uploadAttachment(attachment) {
     return noUpload(attachment.url);
   }
 
-  const fileName = attachment.url.substring(
-    attachment.url.lastIndexOf('/') + 1
-  );
+  const fileName = attachment.url.substring(attachment.url.lastIndexOf('/') + 1);
 
   try {
     // Get the attachment data

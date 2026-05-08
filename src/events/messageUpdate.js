@@ -25,21 +25,13 @@ export default {
     )
       return;
 
-    const guild = await getGuild(
-      oldMessage.guild.id,
-      'logging_channels track_channels'
-    );
+    const guild = await getGuild(oldMessage.guild.id, 'logging_channels track_channels');
     if (!guild) return;
 
     const loggingChannels = guild?.logging_channels;
     const trackChannels = guild?.track_channels;
 
-    if (
-      !loggingChannels?.message_update ||
-      !trackChannels ||
-      !trackChannels.includes(newMessage.channel.id)
-    )
-      return;
+    if (!loggingChannels?.message_update || !trackChannels || !trackChannels.includes(newMessage.channel.id)) return;
 
     const embed = new EmbedBuilder()
       .setColor(0x7289da)
@@ -65,10 +57,7 @@ export default {
       });
     }
 
-    if (
-      oldMessage.attachments.size > 0 &&
-      newMessage.attachments.size !== oldMessage.attachments.size
-    ) {
+    if (oldMessage.attachments.size > 0 && newMessage.attachments.size !== oldMessage.attachments.size) {
       // embed.addFields({ name: 'Previous attachments', value: '.' });
 
       for (const attachment of oldMessage.attachments.values()) {
@@ -82,10 +71,8 @@ export default {
       }
     }
 
-    await newMessage.client.channels
-      .fetch(loggingChannels.message_update)
-      .then((channel) => {
-        channel.send({ embeds: [embed] });
-      });
+    await newMessage.client.channels.fetch(loggingChannels.message_update).then((channel) => {
+      channel.send({ embeds: [embed] });
+    });
   },
 };

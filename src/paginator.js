@@ -5,32 +5,19 @@ class Paginator {
    * @param {import('discord.js').MessageEditOptions[]} data Array with edit options for each page.
    */
   constructor(data) {
-    if (!data?.length)
-      throw new TypeError('Paginator data must have at least one value.');
+    if (!data?.length) throw new TypeError('Paginator data must have at least one value.');
 
     this.data = data;
     this.currentPage = null; // 0-indexed
     this.row = new MessageActionRow().addComponents(
-      new MessageButton()
-        .setCustomId('first')
-        .setLabel('<<')
-        .setStyle('PRIMARY'),
-      new MessageButton()
-        .setCustomId('previous')
-        .setLabel('<')
-        .setStyle('PRIMARY'),
-      new MessageButton()
-        .setCustomId('currentPage')
-        .setStyle('SECONDARY')
-        .setDisabled(true),
+      new MessageButton().setCustomId('first').setLabel('<<').setStyle('PRIMARY'),
+      new MessageButton().setCustomId('previous').setLabel('<').setStyle('PRIMARY'),
+      new MessageButton().setCustomId('currentPage').setStyle('SECONDARY').setDisabled(true),
       new MessageButton().setCustomId('next').setLabel('>').setStyle('PRIMARY'),
       new MessageButton().setCustomId('last').setLabel('>>').setStyle('PRIMARY')
     );
     this.stopRow = new MessageActionRow().addComponents(
-      new MessageButton()
-        .setCustomId('stop')
-        .setLabel('Stop')
-        .setStyle('DANGER')
+      new MessageButton().setCustomId('stop').setLabel('Stop').setStyle('DANGER')
     );
   }
 

@@ -1,8 +1,4 @@
-import {
-  ChannelType,
-  InteractionContextType,
-  SlashCommandBuilder,
-} from 'discord.js';
+import { ChannelType, InteractionContextType, SlashCommandBuilder } from 'discord.js';
 
 export const data = new SlashCommandBuilder()
   .setName('log')

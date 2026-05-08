@@ -1,9 +1,6 @@
 import { Events } from 'discord.js';
 
-import {
-  createWhistleblowerCategory,
-  insertGuild,
-} from '../services/guild.service.js';
+import { createWhistleblowerCategory, insertGuild } from '../services/guild.service.js';
 
 export default {
   name: Events.GuildCreate,
