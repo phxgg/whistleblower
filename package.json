@@ -21,10 +21,10 @@
   "dependencies": {
     "axios": "^1.18.1",
     "discord-api-types": "^0.38.49",
-    "discord.js": "^14.26.4",
+    "discord.js": "^14.26.5",
     "form-data": "^4.0.6",
-    "mongodb": "^7.4.0",
-    "mongoose": "^9.7.3",
+    "mongodb": "^7.5.0",
+    "mongoose": "^9.7.4",
     "nodemon": "^3.1.14",
     "redis": "^6.1.0",
     "winston": "^3.19.0"
@@ -32,10 +32,10 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@ianvs/prettier-plugin-sort-imports": "^4.7.1",
-    "eslint": "^10.6.0",
+    "eslint": "^10.7.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.6",
     "globals": "^17.7.0",
-    "prettier": "3.9.4"
+    "prettier": "3.9.5"
   }
 }
