@@ -3,17 +3,10 @@ services:
     build: .
     restart: unless-stopped
     depends_on:
-      - mongo
       - redis
     volumes:
       - ./config.json:/app/config.json:ro
       - ./logs:/app/logs
-
-  mongo:
-    image: mongo:8
-    restart: unless-stopped
-    volumes:
-      - mongo-data:/data/db
 
   redis:
     image: redis:8-alpine
@@ -22,5 +15,4 @@ services:
       - redis-data:/data
 
 volumes:
-  mongo-data:
   redis-data:
