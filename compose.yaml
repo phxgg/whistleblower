@@ -4,8 +4,9 @@ services:
     restart: unless-stopped
     depends_on:
       - redis
+    env_file:
+      - .env
     volumes:
-      - ./config.json:/app/config.json:ro
       - ./logs:/app/logs
 
   redis:

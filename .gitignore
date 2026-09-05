@@ -1,6 +1,7 @@
 node_modules/
 logs/
 tmp/
+.env
 config.json
 config.json.backup*
 .DS_Store

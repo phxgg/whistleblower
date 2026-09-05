@@ -1,6 +1,6 @@
 import { Events } from 'discord.js';
 
-import config from '../../config.json' with { type: 'json' };
+import config from '../config.js';
 
 export default {
   name: Events.GuildMemberAdd,

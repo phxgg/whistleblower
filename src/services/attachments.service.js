@@ -1,7 +1,7 @@
 import axios from 'axios';
 import FormData from 'form-data';
 
-import config from '../../config.json' with { type: 'json' };
+import config from '../config.js';
 import { BytesToMB } from '../shared.js';
 import { createLogger } from './logger.service.js';
 

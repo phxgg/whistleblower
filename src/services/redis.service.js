@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import redis from 'redis';
 
-import config from '../../config.json' with { type: 'json' };
+import config from '../config.js';
 import { createLogger } from './logger.service.js';
 
 const logger = createLogger(import.meta);
