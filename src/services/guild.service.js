@@ -1,6 +1,6 @@
 import { ChannelType, PermissionsBitField } from 'discord.js';
 
-import config from '../../config.json' with { type: 'json' };
+import config from '../config.js';
 import Guild from '../models/guild.model.js';
 import redisService from '../services/redis.service.js';
 import { handleError } from '../shared.js';

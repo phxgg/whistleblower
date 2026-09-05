@@ -5,7 +5,7 @@ import { pathToFileURL } from 'node:url';
 import { Client, GatewayIntentBits, Partials } from 'discord.js';
 import mongoose from 'mongoose';
 
-import config from '../config.json' with { type: 'json' };
+import config from './config.js';
 import { createLogger } from './services/logger.service.js';
 import redisService from './services/redis.service.js';
 
