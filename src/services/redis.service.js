@@ -7,13 +7,15 @@ import { createLogger } from './logger.service.js';
 const logger = createLogger(import.meta);
 
 const redisClient = redis.createClient({
-  host: config.redis.host,
-  port: config.redis.port,
   password: config.redis.password || undefined,
   socket: {
+    host: config.redis.host,
+    port: config.redis.port,
     reconnectStrategy: () => 1000,
   },
 });
+
+redisClient.on('error', (err) => logger.error(`Redis error: ${err}`));
 
 /**
  * Call this function only once in the application
