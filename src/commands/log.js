@@ -27,4 +27,17 @@ export const data = new SlashCommandBuilder()
           .setName('channel')
           .setDescription('Channel to log edited messages')
       )
-  );
+  )
+  .addSubcommand((subcommand) =>
+    subcommand
+      .setName('all')
+      .setDescription('Setup one logging channel for every event')
+      .addChannelOption((option) =>
+        option
+          .setRequired(true)
+          .addChannelTypes(ChannelType.GuildText)
+          .setName('channel')
+          .setDescription('Channel to log every event')
+      )
+  )
+  .addSubcommand((subcommand) => subcommand.setName('list').setDescription('Show the logging channel of every event'));

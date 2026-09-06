@@ -36,4 +36,11 @@ const BytesToMB = (bytes) => {
   return bytes / 1024 / 1024;
 };
 
-export { handleError, generateRandomString, formatEmoji, BytesToMB };
+/**
+ * Extracts ids out of user supplied text. Accepts commas, spaces, newlines and channel mentions.
+ * @param {string | null} value
+ * @returns {Array<string>} ids
+ */
+const parseIds = (value) => (value ?? '').match(/\d+/g) ?? [];
+
+export { handleError, generateRandomString, formatEmoji, BytesToMB, parseIds };

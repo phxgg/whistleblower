@@ -1,7 +1,7 @@
 import { EmbedBuilder, Events } from 'discord.js';
 
 import { uploadAttachment } from '../services/attachments.service.js';
-import { getGuild } from '../services/guild.service.js';
+import { getGuild, sendToLoggingChannel } from '../services/guild.service.js';
 
 export default {
   name: Events.MessageDelete,
@@ -51,8 +51,6 @@ export default {
       embed.setColor('#ff4040');
     }
 
-    await message.client.channels.fetch(loggingChannels.message_delete).then((channel) => {
-      channel.send({ embeds: [embed] });
-    });
+    await sendToLoggingChannel(message.client, message.guild.id, loggingChannels.message_delete, embed);
   },
 };

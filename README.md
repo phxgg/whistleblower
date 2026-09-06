@@ -47,6 +47,27 @@ $ npm run bot
 
 `.env` is loaded automatically, and ignored if it does not exist, in which case the variables are read from the environment.
 
+Commands are registered globally, so they are available in every guild the bot joins without re-running `npm run register`. If they do not show up in a guild, the bot was invited without the `applications.commands` scope, or the global registration has not propagated yet.
+
+### Commands
+
+All commands require the Administrator permission.
+
+| Command                                   | Description                                                       |
+| ----------------------------------------- | ----------------------------------------------------------------- |
+| `/log message_delete channel:`            | Log deleted messages in a channel                                 |
+| `/log message_update channel:`            | Log edited messages in a channel                                  |
+| `/log all channel:`                       | Log every event in a single channel                               |
+| `/log list`                               | Show the logging channel of every event                           |
+| `/track [channel:]`                       | Track a channel, defaults to the current one                      |
+| `/track all: true [exclude:]`             | Track every text and voice channel, except the excluded ones      |
+| `/untrack [channel:]`                     | Untrack a channel, defaults to the current one                    |
+| `/untrack all: true [exclude:]`           | Untrack every tracked channel, except the excluded ones           |
+
+`exclude` accepts channel mentions or ids, separated by commas, spaces or newlines. `EXCLUDE_CHANNEL_IDS` is always excluded on top of it.
+
+Deleted channels are removed from the tracked channels and from the logging channels automatically.
+
 ### Docker
 
 MongoDB is expected to be an external service, so set `MONGODB_URI` accordingly. Redis runs alongside the bot, which is why `.env` should use `REDIS_HOST=redis`.
@@ -61,13 +82,3 @@ When deploying to a platform that injects environment variables (Coolify, for ex
 ### TODO:
 
 * Review `uploadAttachment` function in `src/services/attachments.service.js`
-
-* Command to see all setup logging channels.
-
-* Check if a logging channel has been deleted, and update database logging_channels object accordingly.
-
-* Command to set all events to one channel
-
-* Commands to track/untrack all channels with option to exclude specific channels
-
-* > __Note__: Not sure but:<br>Seems like when joining a new guild, the bot doesn't register commands in that new guild. Maybe register commands on `guildCreate` event?

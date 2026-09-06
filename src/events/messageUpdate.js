@@ -1,7 +1,7 @@
 import { EmbedBuilder, Events } from 'discord.js';
 
 import { uploadAttachment } from '../services/attachments.service.js';
-import { getGuild } from '../services/guild.service.js';
+import { getGuild, sendToLoggingChannel } from '../services/guild.service.js';
 
 export default {
   name: Events.MessageUpdate,
@@ -71,8 +71,6 @@ export default {
       }
     }
 
-    await newMessage.client.channels.fetch(loggingChannels.message_update).then((channel) => {
-      channel.send({ embeds: [embed] });
-    });
+    await sendToLoggingChannel(newMessage.client, newMessage.guild.id, loggingChannels.message_update, embed);
   },
 };

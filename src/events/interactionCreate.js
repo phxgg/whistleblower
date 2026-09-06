@@ -1,11 +1,15 @@
-import { Events } from 'discord.js';
+import { Events, PermissionsBitField } from 'discord.js';
 
 import {
   addToLoggingChannels,
   addToTrackChannels,
+  getLoggingChannels,
   getTrackChannels,
+  LOG_EVENTS,
   removeFromTrackChannels,
+  trackableChannelIds,
 } from '../services/guild.service.js';
+import { parseIds } from '../shared.js';
 
 export default {
   name: Events.InteractionCreate,
@@ -14,60 +18,79 @@ export default {
    * @param {import('discord.js').Interaction} interaction
    */
   async execute(interaction) {
-    if (!interaction.isCommand()) return;
+    if (!interaction.isChatInputCommand()) return;
 
     await interaction.deferReply({ ephemeral: true });
 
-    const member = interaction.member;
+    if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator))
+      return interaction.editReply(':x: You are not an admin.');
 
-    if (!member.permissions.has('ADMINISTRATOR'))
-      return interaction.editReply({
-        content: ':x: You are not an admin.',
-        ephemeral: true,
-      });
-
-    const channel = interaction.options.getChannel('channel') || interaction.channel;
-
-    const trackChannels = await getTrackChannels(interaction.guild.id);
+    const guildId = interaction.guild.id;
 
     if (interaction.commandName === 'log') {
-      // log
       const event = interaction.options.getSubcommand();
-      await addToLoggingChannels(event, interaction.guild.id, channel.id);
 
-      interaction.editReply(`:white_check_mark: Logging event \`${event}\` in ${channel}`);
-    } else if (interaction.commandName === 'track') {
-      // track
-      if (trackChannels.indexOf(channel.id) !== -1) {
-        return interaction.editReply({
-          content: `:x: Already tracking ${channel.name}`,
-          ephemeral: true,
-        });
+      if (event === 'list') {
+        const loggingChannels = (await getLoggingChannels(guildId)) || {};
+        const lines = LOG_EVENTS.map((e) => `\`${e}\`: ${loggingChannels[e] ? `<#${loggingChannels[e]}>` : 'not set'}`);
+
+        return interaction.editReply(lines.join('\n'));
       }
 
-      // add channel to guild's track_channels array
-      await addToTrackChannels(interaction.guild.id, channel.id);
+      const channel = interaction.options.getChannel('channel');
 
-      await interaction.editReply({
-        content: `:white_check_mark: Tracking ${channel.name}`,
-        ephemeral: true,
-      });
-    } else if (interaction.commandName === 'untrack') {
-      // untrack
-      if (trackChannels.indexOf(channel.id) === -1) {
-        return interaction.editReply({
-          content: `:x: Not tracking ${channel.name}`,
-          ephemeral: true,
-        });
+      if (event === 'all') {
+        for (const e of LOG_EVENTS) {
+          await addToLoggingChannels(e, guildId, channel.id);
+        }
+
+        return interaction.editReply(`:white_check_mark: Logging every event in ${channel}`);
       }
 
-      // remove channel from guild's track_channels array
-      await removeFromTrackChannels(interaction.guild.id, channel.id);
+      await addToLoggingChannels(event, guildId, channel.id);
 
-      await interaction.editReply({
-        content: `:white_check_mark: No longer tracking ${channel.name}`,
-        ephemeral: true,
-      });
+      return interaction.editReply(`:white_check_mark: Logging event \`${event}\` in ${channel}`);
+    }
+
+    if (interaction.commandName === 'track' || interaction.commandName === 'untrack') {
+      const tracking = interaction.commandName === 'track';
+      const trackChannels = await getTrackChannels(guildId);
+
+      if (interaction.options.getBoolean('all')) {
+        const excluded = parseIds(interaction.options.getString('exclude'));
+        // Tracking looks at every eligible channel, untracking only at what is currently tracked.
+        const channelIds = tracking
+          ? (await trackableChannelIds(interaction.guild, excluded)).filter((id) => !trackChannels.includes(id))
+          : trackChannels.filter((id) => !excluded.includes(id));
+
+        if (channelIds.length === 0) {
+          return interaction.editReply(`:x: No channels left to ${interaction.commandName}.`);
+        }
+
+        if (tracking) await addToTrackChannels(guildId, channelIds);
+        else await removeFromTrackChannels(guildId, channelIds);
+
+        return interaction.editReply(
+          `:white_check_mark: ${tracking ? 'Tracking' : 'No longer tracking'} ${channelIds.length} channel(s).`
+        );
+      }
+
+      const channel = interaction.options.getChannel('channel') || interaction.channel;
+
+      if (trackChannels.includes(channel.id) === tracking) {
+        return interaction.editReply(
+          tracking ? `:x: Already tracking ${channel.name}` : `:x: Not tracking ${channel.name}`
+        );
+      }
+
+      if (tracking) await addToTrackChannels(guildId, channel.id);
+      else await removeFromTrackChannels(guildId, channel.id);
+
+      return interaction.editReply(
+        tracking
+          ? `:white_check_mark: Tracking ${channel.name}`
+          : `:white_check_mark: No longer tracking ${channel.name}`
+      );
     }
   },
 };

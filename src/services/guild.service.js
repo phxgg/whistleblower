@@ -1,9 +1,35 @@
-import { ChannelType, PermissionsBitField } from 'discord.js';
+import { ChannelType, PermissionsBitField, RESTJSONErrorCodes } from 'discord.js';
 
 import config from '../config.js';
 import Guild from '../models/guild.model.js';
 import redisService from '../services/redis.service.js';
 import { handleError } from '../shared.js';
+
+/**
+ * Every event that can be assigned a logging channel.
+ * @type {Array<'message_delete' | 'message_update'>}
+ */
+export const LOG_EVENTS = ['message_delete', 'message_update'];
+
+/**
+ * Ids of the channels of a guild that are eligible for tracking.
+ * @param {import('discord.js').Guild} guild
+ * @param {Array<string>} excludeIds extra ids to skip, on top of `EXCLUDE_CHANNEL_IDS`
+ * @returns {Promise<Array<string>>}
+ */
+export async function trackableChannelIds(guild, excludeIds = []) {
+  const channels = await guild.channels.fetch();
+
+  return channels
+    .filter(
+      (channel) =>
+        channel &&
+        (channel.type === ChannelType.GuildText || channel.type === ChannelType.GuildVoice) &&
+        !config.exclude_channel_ids.includes(channel.id) &&
+        !excludeIds.includes(channel.id)
+    )
+    .map((channel) => channel.id);
+}
 
 /**
  * @param {string} guildId
@@ -31,16 +57,7 @@ export async function insertGuild(guild) {
   };
 
   if (config.track_all_channels_by_default) {
-    const channels = await guild.channels.fetch();
-
-    channels.map((channel) => {
-      if (
-        (channel.type === ChannelType.GuildText || channel.type === ChannelType.GuildVoice) &&
-        !config.exclude_channel_ids.includes(channel.id)
-      ) {
-        guildObject.track_channels.push(channel.id);
-      }
-    });
+    guildObject.track_channels = await trackableChannelIds(guild);
   }
 
   const g = new Guild(guildObject);
@@ -108,13 +125,13 @@ export async function getTrackChannels(guildId) {
 }
 
 /**
- * Adds a new channel, for tracking, to the database
+ * Adds one or more channels, for tracking, to the database
  * @param {string} guildId
- * @param {string} channelId
+ * @param {string | Array<string>} channelIds
  * @returns {Promise<void>}
  */
-export async function addToTrackChannels(guildId, channelId) {
-  const updateQuery = { $push: { track_channels: channelId } };
+export async function addToTrackChannels(guildId, channelIds) {
+  const updateQuery = { $addToSet: { track_channels: { $each: [].concat(channelIds) } } };
   try {
     await Guild.updateOne({ guild_id: guildId }, updateQuery);
   } catch (err) {
@@ -124,19 +141,63 @@ export async function addToTrackChannels(guildId, channelId) {
 }
 
 /**
- * Removes a tracking channel from the database
+ * Removes one or more tracking channels from the database
  * @param {string} guildId
- * @param {string} channelId
+ * @param {string | Array<string>} channelIds
  * @returns {Promise<void>}
  */
-export async function removeFromTrackChannels(guildId, channelId) {
-  const updateQuery = { $pull: { track_channels: channelId } };
+export async function removeFromTrackChannels(guildId, channelIds) {
+  const updateQuery = { $pull: { track_channels: { $in: [].concat(channelIds) } } };
   try {
     await Guild.updateOne({ guild_id: guildId }, updateQuery);
   } catch (err) {
     handleError(err);
   }
   redisService.clearKey(Guild.collection.collectionName);
+}
+
+/**
+ * Forgets a channel that no longer exists: stops tracking it and unsets every logging event pointing at it
+ * @param {string} guildId
+ * @param {string} channelId
+ * @returns {Promise<void>}
+ */
+export async function removeChannel(guildId, channelId) {
+  const loggingChannels = (await getLoggingChannels(guildId)) || {};
+  const events = LOG_EVENTS.filter((event) => loggingChannels[event] === channelId);
+
+  const updateQuery = { $pull: { track_channels: channelId } };
+  if (events.length > 0) {
+    updateQuery.$unset = Object.fromEntries(events.map((event) => [`logging_channels.${event}`, '']));
+  }
+
+  try {
+    await Guild.updateOne({ guild_id: guildId }, updateQuery);
+  } catch (err) {
+    handleError(err);
+  }
+  redisService.clearKey(Guild.collection.collectionName);
+}
+
+/**
+ * Sends an embed to a logging channel, forgetting the channel if it has been deleted in the meantime
+ * @param {import('discord.js').Client} client
+ * @param {string} guildId
+ * @param {string} channelId
+ * @param {import('discord.js').EmbedBuilder} embed
+ * @returns {Promise<void>}
+ */
+export async function sendToLoggingChannel(client, guildId, channelId, embed) {
+  try {
+    const channel = await client.channels.fetch(channelId);
+    await channel.send({ embeds: [embed] });
+  } catch (err) {
+    if (err.code === RESTJSONErrorCodes.UnknownChannel) {
+      await removeChannel(guildId, channelId);
+      return;
+    }
+    handleError(err);
+  }
 }
 
 /**
