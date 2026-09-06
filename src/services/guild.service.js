@@ -95,6 +95,20 @@ export async function getLoggingChannels(guildId) {
 }
 
 /**
+ * Id of the channel an event should be logged in, or null when the event is not logged
+ * or the channel the event happened in is not tracked
+ * @param {string} guildId
+ * @param {'message_delete' | 'message_update'} event
+ * @param {string} channelId channel the event happened in
+ * @returns {Promise<string | null>}
+ */
+export async function resolveLoggingChannel(guildId, event, channelId) {
+  const guild = await getGuild(guildId, 'logging_channels track_channels');
+  if (!guild?.track_channels?.includes(channelId)) return null;
+  return guild.logging_channels?.[event] ?? null;
+}
+
+/**
  * Adds a new logging channel to the database
  * @param {string} event
  * @param {string} guildId

@@ -1,6 +1,9 @@
 import { Events } from 'discord.js';
 
 import config from '../config.js';
+import { createLogger } from '../services/logger.service.js';
+
+const logger = createLogger(import.meta);
 
 export default {
   name: Events.GuildMemberAdd,
@@ -9,18 +12,13 @@ export default {
    * @param {import('discord.js').GuildMember} member
    */
   async execute(member) {
-    const bannedUserIds = config.banned_user_ids || [];
-    if (bannedUserIds.includes(member.id)) {
-      return member
-        .ban({
-          reason: 'Banned user tried to join the server',
-        })
-        .then(() => {
-          console.log(`Banned ${member.user.username} for being a banned user.`);
-        })
-        .catch((err) => {
-          console.error(`Failed to ban ${member.user.username}:`, err);
-        });
+    if (!config.banned_user_ids.includes(member.id)) return;
+
+    try {
+      await member.ban({ reason: 'Banned user tried to join the server' });
+      logger.info(`Banned ${member.user.username} for being a banned user.`);
+    } catch (err) {
+      logger.error(`Failed to ban ${member.user.username}: ${err}`);
     }
   },
 };

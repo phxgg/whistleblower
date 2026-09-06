@@ -30,6 +30,8 @@ export default {
     password: process.env.REDIS_PASSWORD || '',
   },
 
+  log_to_file: bool(process.env.LOG_TO_FILE, true),
+
   track_all_channels_by_default: bool(process.env.TRACK_ALL_CHANNELS_BY_DEFAULT, true),
   upload_attachments: bool(process.env.UPLOAD_ATTACHMENTS, false),
 

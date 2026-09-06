@@ -1,59 +1,26 @@
-import { EmbedBuilder, Events } from 'discord.js';
+import { Events } from 'discord.js';
 
-import { uploadAttachment } from '../services/attachments.service.js';
-import { getGuild, sendToLoggingChannel } from '../services/guild.service.js';
+import { deletedMessageEmbed } from '../embeds.js';
+import { resolveLoggingChannel, sendToLoggingChannel } from '../services/guild.service.js';
 
 export default {
   name: Events.MessageBulkDelete,
   once: false,
   /**
-   * @param {import('discord.js').Message[]} messages
+   * @param {import('discord.js').Collection<string, import('discord.js').Message>} messages
    * @param {import('discord.js').Channel} channel
    */
   async execute(messages, channel) {
-    const guild = await getGuild(channel.guild.id, 'logging_channels track_channels');
-    if (!guild) return;
-
-    const loggingChannels = guild?.logging_channels;
-    const trackChannels = guild?.track_channels;
-
-    if (!loggingChannels?.message_delete || !trackChannels || !trackChannels.includes(channel.id)) return;
+    const loggingChannelId = await resolveLoggingChannel(channel.guild.id, 'message_delete', channel.id);
+    if (!loggingChannelId) return;
 
     for (const message of messages.values()) {
-      if (message.partial) return; // content is null or deleted embed
-      if (message.author.bot) return; // ignore bots
+      if (message.partial) continue; // content is null or deleted embed
+      if (message.author.bot) continue; // ignore bots
 
-      const embed = new EmbedBuilder()
-        .setAuthor({
-          name: message.author.tag,
-          iconURL: message.author.displayAvatarURL(),
-        })
-        .setTitle('Message Deleted')
-        .setDescription(message.content ? message.content : 'None')
-        .setFooter({
-          text: `#${message.channel.name}`,
-        })
-        .setTimestamp(message.createdAt);
+      const embed = await deletedMessageEmbed(message);
 
-      if (message.attachments.size > 0) {
-        for (const attachment of message.attachments.values()) {
-          const upload = await uploadAttachment(attachment);
-          const attachmentLink = upload?.link ? upload.link : 'None';
-          embed.addFields({
-            name: attachment.name,
-            value: attachmentLink,
-            inline: true,
-          });
-        }
-      }
-
-      if (message.author.bot) {
-        embed.setColor(0x7289da);
-      } else {
-        embed.setColor('#ff4040');
-      }
-
-      await sendToLoggingChannel(message.client, channel.guild.id, loggingChannels.message_delete, embed);
+      await sendToLoggingChannel(message.client, channel.guild.id, loggingChannelId, embed);
     }
   },
 };

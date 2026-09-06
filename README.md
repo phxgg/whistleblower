@@ -20,6 +20,7 @@ $ cp .env.example .env
 | `REDIS_HOST`                    | no       | `127.0.0.1` | Redis host (`redis` when running with Docker Compose)   |
 | `REDIS_PORT`                    | no       | `6379`      | Redis port                                              |
 | `REDIS_PASSWORD`                | no       |             | Leave empty if no password is set                       |
+| `LOG_TO_FILE`                   | no       | `true`      | Write logs to `logs/error.log` and `logs/combined.log`  |
 | `TRACK_ALL_CHANNELS_BY_DEFAULT` | no       | `true`      | Track every channel of a guild on join                  |
 | `UPLOAD_ATTACHMENTS`            | no       | `false`     | Upload attachments to [SafeNote](https://safenote.co/)  |
 | `EXCLUDE_CHANNEL_IDS`           | no       |             | Channel ids never tracked automatically                 |

@@ -1,5 +1,7 @@
 import { InteractionContextType, SlashCommandBuilder } from 'discord.js';
 
+import { setTracking } from './track.js';
+
 export const data = new SlashCommandBuilder()
   .setName('untrack')
   .setDescription('Untrack a channel')
@@ -9,3 +11,10 @@ export const data = new SlashCommandBuilder()
   .addStringOption((option) =>
     option.setName('exclude').setDescription('Channels to keep tracking when using all (mentions or ids)')
   );
+
+/**
+ * @param {import('discord.js').ChatInputCommandInteraction} interaction
+ */
+export async function execute(interaction) {
+  return setTracking(interaction, false);
+}

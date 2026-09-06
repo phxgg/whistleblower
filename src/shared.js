@@ -1,8 +1,16 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { pathToFileURL } from 'node:url';
+
+import { createLogger } from './services/logger.service.js';
+
+const logger = createLogger(import.meta);
+
 /**
  * @param {*} err
  */
 const handleError = (err) => {
-  console.error(err);
+  logger.error(err);
 };
 
 /**
@@ -43,4 +51,14 @@ const BytesToMB = (bytes) => {
  */
 const parseIds = (value) => (value ?? '').match(/\d+/g) ?? [];
 
-export { handleError, generateRandomString, formatEmoji, BytesToMB, parseIds };
+/**
+ * Imports every javascript module of a directory
+ * @param {string} dirPath absolute path of the directory
+ * @returns {Promise<Array<Object>>} the imported modules
+ */
+const loadModules = async (dirPath) => {
+  const files = fs.readdirSync(dirPath).filter((file) => file.endsWith('.js'));
+  return Promise.all(files.map((file) => import(pathToFileURL(path.join(dirPath, file)).href)));
+};
+
+export { handleError, generateRandomString, formatEmoji, BytesToMB, parseIds, loadModules };

@@ -9,12 +9,10 @@ import config from '../src/config.js';
 
 const rest = new REST({ version: '10' }).setToken(config.token);
 
-(async () => {
-  try {
-    const data = await rest.put(Routes.applicationCommands(config.application_id), { body: [] });
+try {
+  await rest.put(Routes.applicationCommands(config.application_id), { body: [] });
 
-    console.log(`[whistleblower] Successfully deleted all application (/) commands.`);
-  } catch (err) {
-    console.error(err);
-  }
-})();
+  console.log(`[whistleblower] Successfully deleted all application (/) commands.`);
+} catch (err) {
+  console.error(err);
+}
