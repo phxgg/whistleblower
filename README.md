@@ -22,7 +22,12 @@ $ cp .env.example .env
 | `REDIS_PASSWORD`                | no       |             | Leave empty if no password is set                       |
 | `LOG_TO_FILE`                   | no       | `true`      | Write logs to `logs/error.log` and `logs/combined.log`  |
 | `TRACK_ALL_CHANNELS_BY_DEFAULT` | no       | `true`      | Track every channel of a guild on join                  |
-| `UPLOAD_ATTACHMENTS`            | no       | `false`     | Upload attachments to [SafeNote](https://safenote.co/)  |
+| `UPLOAD_ATTACHMENTS`            | no       | `false`     | Upload attachments somewhere that outlives the message  |
+| `UPLOAD_PROVIDER`               | no       | `safenote`  | `safenote` or `nextcloud`                               |
+| `NEXTCLOUD_URL`                 | nextcloud|             | Base url of the instance, e.g. `https://cloud.example.com` |
+| `NEXTCLOUD_USERNAME`            | nextcloud|             | User the files are uploaded as                          |
+| `NEXTCLOUD_APP_PASSWORD`        | nextcloud|             | App password of that user                               |
+| `NEXTCLOUD_PATH`                | no       | `whistleblower` | Folder the attachments are uploaded to, created if missing |
 | `EXCLUDE_CHANNEL_IDS`           | no       |             | Channel ids never tracked automatically                 |
 | `BANNED_USER_IDS`               | no       |             | User ids banned from using the bot                      |
 
@@ -34,7 +39,16 @@ EXCLUDE_CHANNEL_IDS="111
 222"
 ```
 
-Missing required variables make the bot exit on start with the name of the missing one.
+Missing required variables make the bot exit on start with the name of the missing one. The `nextcloud` ones are only required when `UPLOAD_ATTACHMENTS=true` and `UPLOAD_PROVIDER=nextcloud`.
+
+#### Attachments
+
+Attachments of a deleted or edited message stay on the discord cdn only as long as the message does, so `UPLOAD_ATTACHMENTS=true` copies them somewhere they survive:
+
+* `safenote` uploads to [SafeNote](https://safenote.co/), which deletes the file again after 3 days.
+* `nextcloud` uploads to your own instance over WebDAV and creates a public read only share link. Create the app password under *Settings > Security > Devices & sessions*, and make sure public link sharing is enabled, otherwise the file is uploaded but the embed falls back to the cdn url.
+
+Either way, attachments over 20MB and failed uploads fall back to linking the discord cdn.
 
 ### Setup
 

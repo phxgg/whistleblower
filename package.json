@@ -9,6 +9,7 @@
     "delete": "node --env-file-if-exists=.env scripts/delete.mjs",
     "bot": "node --env-file-if-exists=.env src/index.js",
     "dev": "nodemon --exec \"node --env-file-if-exists=.env\" src/index.js",
+    "test": "node --test",
     "lint:check": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
