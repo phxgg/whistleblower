@@ -1,7 +1,7 @@
-import { EmbedBuilder, Events } from 'discord.js';
+import { Events } from 'discord.js';
 
-import { uploadAttachment } from '../services/attachments.service.js';
-import { getGuild } from '../services/guild.service.js';
+import { editedMessageEmbed } from '../embeds.js';
+import { resolveLoggingChannel, sendToLoggingChannel } from '../services/guild.service.js';
 
 export default {
   name: Events.MessageUpdate,
@@ -14,65 +14,15 @@ export default {
     if (oldMessage.partial || newMessage.partial) return; // content is null
     if (oldMessage.author.bot) return; // ignore bots
 
-    // content is the same
-    if (
-      oldMessage.content === newMessage.content &&
-      oldMessage.attachments.size === newMessage.attachments.size
-      // && oldMessage.attachments.every((attachment, index) => {
-      //   // return attachment.url === newMessage.attachments[index].url;
-      //   return newMessage.attachments.has(attachment.id);
-      // })
-    )
+    // nothing changed
+    if (oldMessage.content === newMessage.content && oldMessage.attachments.size === newMessage.attachments.size)
       return;
 
-    const guild = await getGuild(oldMessage.guild.id, 'logging_channels track_channels');
-    if (!guild) return;
+    const loggingChannelId = await resolveLoggingChannel(oldMessage.guild.id, 'message_update', newMessage.channel.id);
+    if (!loggingChannelId) return;
 
-    const loggingChannels = guild?.logging_channels;
-    const trackChannels = guild?.track_channels;
+    const embed = await editedMessageEmbed(oldMessage, newMessage);
 
-    if (!loggingChannels?.message_update || !trackChannels || !trackChannels.includes(newMessage.channel.id)) return;
-
-    const embed = new EmbedBuilder()
-      .setColor(0x7289da)
-      .setAuthor({
-        name: newMessage.author.tag,
-        iconURL: newMessage.author.displayAvatarURL(),
-      })
-      .setTitle('Message Edited')
-      .setDescription(`[see message](${newMessage.url})`)
-      .addFields({
-        name: 'Original',
-        value: oldMessage.content ? oldMessage.content : 'None',
-      })
-      .setFooter({
-        text: `#${newMessage.channel.name}`,
-      })
-      .setTimestamp(newMessage.createdAt);
-
-    if (oldMessage.content !== newMessage.content) {
-      embed.addFields({
-        name: 'Edited',
-        value: newMessage.content ? newMessage.content : 'None',
-      });
-    }
-
-    if (oldMessage.attachments.size > 0 && newMessage.attachments.size !== oldMessage.attachments.size) {
-      // embed.addFields({ name: 'Previous attachments', value: '.' });
-
-      for (const attachment of oldMessage.attachments.values()) {
-        const upload = await uploadAttachment(attachment);
-        const attachmentLink = upload.link || 'None';
-        embed.addFields({
-          name: attachment.name,
-          value: attachmentLink,
-          inline: true,
-        });
-      }
-    }
-
-    await newMessage.client.channels.fetch(loggingChannels.message_update).then((channel) => {
-      channel.send({ embeds: [embed] });
-    });
+    await sendToLoggingChannel(newMessage.client, newMessage.guild.id, loggingChannelId, embed);
   },
 };
