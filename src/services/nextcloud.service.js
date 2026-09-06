@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 import config from '../config.js';
-import { generateRandomString } from '../shared.js';
+import { generateRandomString, SHARE_LIFETIME_DAYS } from '../shared.js';
 import { createLogger } from './logger.service.js';
 
 const logger = createLogger(import.meta);
@@ -47,11 +47,14 @@ async function createFolder() {
 }
 
 /**
- * Creates a public read only share for a file
+ * Creates a public read only share for a file, expiring after SHARE_LIFETIME_DAYS
  * @param {string} filePath path of the file, relative to the files root of the user
  * @returns {Promise<string | null>} the share url, or null if sharing is not allowed
  */
 async function createShareLink(filePath) {
+  // Nextcloud expects a plain date, the share then dies at the end of that day.
+  const expireDate = new Date(Date.now() + SHARE_LIFETIME_DAYS * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
   // docs: https://docs.nextcloud.com/server/latest/developer_manual/client_apis/OCS/ocs-share-api.html
   const res = await axios({
     method: 'POST',
@@ -62,6 +65,7 @@ async function createShareLink(filePath) {
       path: filePath,
       shareType: '3', // public link
       permissions: '1', // read only
+      expireDate,
     }),
   });
 

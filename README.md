@@ -46,9 +46,9 @@ Missing required variables make the bot exit on start with the name of the missi
 Attachments of a deleted or edited message stay on the discord cdn only as long as the message does, so `UPLOAD_ATTACHMENTS=true` copies them somewhere they survive:
 
 * `safenote` uploads to [SafeNote](https://safenote.co/), which deletes the file again after 3 days.
-* `nextcloud` uploads to your own instance over WebDAV and creates a public read only share link. Create the app password under *Settings > Security > Devices & sessions*, and make sure public link sharing is enabled, otherwise the file is uploaded but no link can be shared.
+* `nextcloud` uploads to your own instance over WebDAV and creates a public read only share link, which also expires after 3 days. Create the app password under *Settings > Security > Devices & sessions*, and make sure public link sharing is enabled, otherwise the file is uploaded but no link can be shared.
 
-The discord cdn url is never logged. The attachment of a deleted message is removed from the cdn together with the message, so the link would already be dead by the time someone reads the log. Attachments over 20MB, failed uploads and `UPLOAD_ATTACHMENTS=false` are logged as `Not saved`, with the file name still in the embed.
+Attachments over 20MB, failed uploads and `UPLOAD_ATTACHMENTS=false` fall back to the discord cdn url. That link dies together with the message it belonged to, so it is only worth something while the attachment is still on the cdn.
 
 ### Setup
 

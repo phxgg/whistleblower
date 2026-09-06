@@ -13,6 +13,9 @@ const handleError = (err) => {
   logger.error(err);
 };
 
+// How long an uploaded attachment stays reachable, for every upload provider.
+const SHARE_LIFETIME_DAYS = 3;
+
 /**
  * @param {number} length
  * @returns {string} random string of given length
@@ -61,4 +64,4 @@ const loadModules = async (dirPath) => {
   return Promise.all(files.map((file) => import(pathToFileURL(path.join(dirPath, file)).href)));
 };
 
-export { handleError, generateRandomString, formatEmoji, BytesToMB, parseIds, loadModules };
+export { handleError, generateRandomString, formatEmoji, BytesToMB, parseIds, loadModules, SHARE_LIFETIME_DAYS };

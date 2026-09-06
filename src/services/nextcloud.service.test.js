@@ -66,4 +66,8 @@ test('uploads the file, creates every missing folder and shares it publicly', as
   const shared = new URLSearchParams(share.body.toString());
   assert.equal(shared.get('path'), decodeURIComponent(upload.url.replace('/remote.php/dav/files/bot', '')));
   assert.equal(shared.get('shareType'), '3');
+
+  // The link expires 3 days from now.
+  const expected = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  assert.equal(shared.get('expireDate'), expected);
 });

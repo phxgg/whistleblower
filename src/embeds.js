@@ -13,7 +13,7 @@ async function addAttachmentFields(embed, attachments) {
     const link = await uploadAttachment(attachment);
     embed.addFields({
       name: attachment.name,
-      value: link || 'Not saved',
+      value: link || 'None',
       inline: true,
     });
   }
