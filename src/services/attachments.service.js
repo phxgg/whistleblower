@@ -8,16 +8,8 @@ import { uploadToNextcloud } from './nextcloud.service.js';
 
 const logger = createLogger(import.meta);
 
-// Attachments bigger than this are linked to the discord cdn instead of being uploaded.
+// Attachments bigger than this are not uploaded.
 const MAX_ATTACHMENT_MB = 20;
-
-/**
- * @param {string} msg
- * @returns {{ link: string }}
- */
-function noUpload(msg) {
-  return { link: msg };
-}
 
 /**
  * Wrap a function to retry n times on failure
@@ -66,20 +58,21 @@ async function uploadToSafenote(data, fileName) {
 
 /**
  * Upload attachment to the configured file sharing provider.
- * Sometimes, the attachment is instantly deleted from the discord cdn,
- * before we can even download it. In that case, the file is not uploaded.
+ * The discord cdn url is never handed back, an attachment of a deleted message is gone from
+ * the cdn as well, so a link to it would be dead by the time anyone reads the log.
+ * Sometimes the attachment is deleted before we can even download it, and is not uploaded.
  * @param {import('discord.js').Attachment} attachment
- * @returns {Promise<{ link: string }>} the uploaded copy, or the discord cdn url when it could not be uploaded
+ * @returns {Promise<string | null>} link to the uploaded copy, or null if there is none
  */
 export async function uploadAttachment(attachment) {
   // Only enable if upload_attachments is true
   if (!config.upload_attachments) {
-    return noUpload(attachment.url); // return attachment url
+    return null;
   }
 
   if (BytesToMB(attachment.size) > MAX_ATTACHMENT_MB) {
     logger.warn(`Attachment size too big: ${attachment.size}`);
-    return noUpload(attachment.url);
+    return null;
   }
 
   // The cdn url carries the signature as a query string, so it is not a usable file name.
@@ -97,13 +90,11 @@ export async function uploadAttachment(attachment) {
 
     const data = Buffer.from(res.data);
 
-    const link = await retryFn(3, () =>
+    return await retryFn(3, () =>
       config.upload_provider === 'nextcloud' ? uploadToNextcloud(data, fileName) : uploadToSafenote(data, fileName)
     );
-
-    return link ? { link } : noUpload(attachment.url);
   } catch (err) {
     logger.error(`Error uploading attachment: ${err}`);
-    return noUpload(attachment.url);
+    return null;
   }
 }

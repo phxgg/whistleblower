@@ -10,10 +10,10 @@ import { uploadAttachment } from './services/attachments.service.js';
  */
 async function addAttachmentFields(embed, attachments) {
   for (const attachment of attachments.values()) {
-    const upload = await uploadAttachment(attachment);
+    const link = await uploadAttachment(attachment);
     embed.addFields({
       name: attachment.name,
-      value: upload?.link || 'None',
+      value: link || 'Not saved',
       inline: true,
     });
   }
